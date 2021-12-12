@@ -28,19 +28,8 @@ public class AdminPermissionServiceImpl implements AdminPermissionService {
 	}
 
 	private List<AdminAction> filterPermission(List<String> permission, List<AdminAction> actions) {
-		List<AdminAction> ac = actions.stream().filter(e -> {
-			if(permission.contains(e.getId() + ".ANY")) return true;
-			return false;
-		}).toList();
 		
-		ac.stream().forEach(a -> {
-			List<AdminActionMethod> m = a.getMethods();
-			m.stream().filter(f -> {
-				if(permission.contains(a.getId() + "." + f.getId())) return true;
-				return false;
-			});
-		});
-		return ac;
+		return null;
 	}
 	
 

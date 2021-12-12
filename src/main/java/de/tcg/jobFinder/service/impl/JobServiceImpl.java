@@ -72,9 +72,10 @@ public class JobServiceImpl extends UntilService implements JobService {
 	@Override
 	public List<Map<String, Object>> getJobs(int limit, String orderBy, String orderType, String search) {
 		List<Job> jobs = jobReposity.findAllWithQuerySearch(orderBy);
-		List<Business> businesses = jobs.stream().map(e -> {
-			return businessReposity.findByBusinessId(e.getBusinessId());
-		}).toList();
+		List<Business> businesses = new ArrayList<Business>(); 
+		for(Job job : jobs) {
+			businesses.add(businessReposity.findByBusinessId(job.getBusinessId()));
+		}
 
 		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
 		for (int i = 0; i < jobs.size(); i++) {

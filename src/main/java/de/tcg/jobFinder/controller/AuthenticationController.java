@@ -61,6 +61,12 @@ public class AuthenticationController {
 		return ResponseEntity.ok(new SuccessResponse(0, "success", res));
 	}
 
+	@RequestMapping(value = "/authenticate/helloWorld", method = RequestMethod.GET)
+	public ResponseEntity<?> helloWorld(@RequestBody AuthenticationRequest authenticationRequest){
+			
+		return ResponseEntity.ok(new SuccessResponse(0, "success", null));
+	}
+	
 	@RequestMapping(value = "/authenticate/checkToken", method = RequestMethod.GET)
 	public ResponseEntity<?> checkToken(HttpServletRequest request) {
 		final String authorizationHeader = request.getHeader("Authorization");
