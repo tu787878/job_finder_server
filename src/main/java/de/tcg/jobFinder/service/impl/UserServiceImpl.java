@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import de.tcg.jobFinder.entity.Account;
 import de.tcg.jobFinder.entity.AccountToken;
@@ -14,6 +15,7 @@ import de.tcg.jobFinder.service.AccountTokenService;
 import de.tcg.jobFinder.service.MyUserDetailsService;
 import de.tcg.jobFinder.service.UserService;
 
+@Service
 public class UserServiceImpl extends UntilService implements UserService {
 
 	@Autowired
