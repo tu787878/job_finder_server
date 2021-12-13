@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import de.tcg.jobFinder.controller.JobApi;
 import de.tcg.jobFinder.dto.SuccessResponse;
 import de.tcg.jobFinder.entity.City;
-import de.tcg.jobFinder.entity.Job;
 import de.tcg.jobFinder.entity.JobCategory;
 import de.tcg.jobFinder.entity.JobTag;
 

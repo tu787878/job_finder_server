@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 
 import de.tcg.jobFinder.entity.Business;
 import de.tcg.jobFinder.entity.BusinessCategory;
-import de.tcg.jobFinder.entity.City;
 
 
 public interface BusinessService {
