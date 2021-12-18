@@ -14,7 +14,7 @@ public interface JobService {
 	
 	public boolean createExampleJob();
 	
-	public List<Map<String,Object>> getJobs(int limit, String orderBy, String orderType, String search);
+	public List<Job> getJobs(int limit, String orderBy, String orderType, String search);
 	
 	public List<JobCategory> getJobCategories();
 	

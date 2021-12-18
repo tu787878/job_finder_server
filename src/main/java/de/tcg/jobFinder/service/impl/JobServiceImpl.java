@@ -1,20 +1,12 @@
 package de.tcg.jobFinder.service.impl;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import de.tcg.jobFinder.dto.SuccessResponse;
 import de.tcg.jobFinder.entity.Account;
 import de.tcg.jobFinder.entity.AccountToken;
 import de.tcg.jobFinder.entity.Business;
@@ -57,38 +49,15 @@ public class JobServiceImpl extends UntilService implements JobService {
 
 	@Override
 	public boolean createExampleJob() {
-		JobCategory jobCategory = jobCategoryReposity.getById((long) 6);
-		City city = cityReposity.getById((long) 1);
-		Set<JobTag> jobTags = new HashSet<JobTag>();
-		jobTags.add(jobTagReposity.getById((long) 13));
-		jobTags.add(jobTagReposity.getById((long) 14));
-		Job job = new Job("Job_01", "Test Job", "mymycuisine", "", "Bad Birnbach", "jeden Tag", "", 0, 0, 15, 20, true,
-				12345, LocalDateTime.now(), LocalDateTime.now().plusDays(2), jobCategory, city, "", "", jobTags);
-		if (jobReposity.save(job) != null)
-			return true;
+		
 		return false;
 	}
 
 	@Override
-	public List<Map<String, Object>> getJobs(int limit, String orderBy, String orderType, String search) {
+	public List<Job> getJobs(int limit, String orderBy, String orderType, String search) {
 		List<Job> jobs = jobReposity.findAllWithQuerySearch(orderBy);
-		List<Business> businesses = new ArrayList<Business>(); 
-		for(Job job : jobs) {
-			businesses.add(businessReposity.findByBusinessId(job.getBusinessId()));
-		}
-
-		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-		for (int i = 0; i < jobs.size(); i++) {
-			Job job = jobs.get(i);
-			Business business = businesses.get(i);
-
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("job", job);
-			map.put("business", business);
-			resultList.add(map);
-		}
-
-		return resultList;
+		
+		return jobs;
 	}
 
 	@Override
@@ -128,9 +97,9 @@ public class JobServiceImpl extends UntilService implements JobService {
 			if (accountToken != null && accountToken.isActive()) {
 				Account account = myUserDetailsService.getAccountByAccountId(accountToken.getAccountId());
 				businessId = account.getBusinessId();
-				
+				Business business = businessReposity.findByBusinessId(businessId);
 
-				job.setBusinessId(businessId);
+				job.setBusiness(business);
 				job.setJobId("JOB_" + generateRandomId(10));
 				System.out.println(job);
 				jobReposity.save(job);

@@ -29,8 +29,9 @@ public class Job {
 	@Column(name = "job_name")
 	private String jobName;
 
-	@Column(name = "business_id", unique = false)
-	private String businessId;
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "businessId", referencedColumnName = "businessId")
+	private Business business;
 
 	@Column(name = "job_description", length = 1000)
 	private String jobDescription;
@@ -89,14 +90,14 @@ public class Job {
 	public Job() {
 	}
 
-	public Job(Long id, String jobId, String jobName, String businessId, String jobDescription, String jobAddress,
+	public Job(Long id, String jobId, String jobName, Business businessId, String jobDescription, String jobAddress,
 			String workingTime, String note, long jobLatitude, long jobLongitude, float salaryFrom, float salaryTo,
 			boolean isActive, int postCode, LocalDateTime createdTime, LocalDateTime expiredTime, JobCategory jobCategory, City city,
 			String jobRequirements, String jobBenefits, Set<JobTag> jobTag) {
 		this.id = id;
 		this.jobId = jobId;
 		this.jobName = jobName;
-		this.businessId = businessId;
+		this.business = businessId;
 		this.jobDescription = jobDescription;
 		this.jobAddress = jobAddress;
 		this.workingTime = workingTime;
@@ -116,13 +117,13 @@ public class Job {
 		this.jobTag = jobTag;
 	}
 
-	public Job(String jobId, String jobName, String businessId, String jobDescription, String jobAddress,
+	public Job(String jobId, String jobName, Business businessId, String jobDescription, String jobAddress,
 			String workingTime, String note, long jobLatitude, long jobLongitude, float salaryFrom, float salaryTo,
 			boolean isActive, int postCode, LocalDateTime createdTime, LocalDateTime expiredTime, JobCategory jobCategory, City city,
 			String jobRequirements, String jobBenefits, Set<JobTag> jobTag) {
 		this.jobId = jobId;
 		this.jobName = jobName;
-		this.businessId = businessId;
+		this.business = businessId;
 		this.jobDescription = jobDescription;
 		this.jobAddress = jobAddress;
 		this.workingTime = workingTime;
@@ -166,12 +167,12 @@ public class Job {
 		this.jobName = jobName;
 	}
 
-	public String getBusinessId() {
-		return businessId;
+	public Business getBusiness() {
+		return business;
 	}
 
-	public void setBusinessId(String businessId) {
-		this.businessId = businessId;
+	public void setBusiness(Business businessId) {
+		this.business = businessId;
 	}
 
 	public String getJobDescription() {
@@ -308,7 +309,7 @@ public class Job {
 
 	@Override
 	public String toString() {
-		return "Job [id=" + id + ", jobId=" + jobId + ", jobName=" + jobName + ", businessId=" + businessId
+		return "Job [id=" + id + ", jobId=" + jobId + ", jobName=" + jobName + ", businessId=" + business
 				+ ", jobDescription=" + jobDescription + ", jobAddress=" + jobAddress + ", workingTime=" + workingTime
 				+ ", note=" + note + ", jobLatitude=" + jobLatitude + ", jobLongitude=" + jobLongitude + ", salaryFrom="
 				+ salaryFrom + ", salaryTo=" + salaryTo + ", isActive=" + isActive + ", postCode=" + postCode
