@@ -1,12 +1,21 @@
 package de.tcg.jobFinder.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import de.tcg.jobFinder.dto.JobQuerySearch;
 import de.tcg.jobFinder.entity.Account;
 import de.tcg.jobFinder.entity.AccountToken;
 import de.tcg.jobFinder.entity.Business;
@@ -22,6 +31,7 @@ import de.tcg.jobFinder.reposity.JobTagReposity;
 import de.tcg.jobFinder.service.AccountTokenService;
 import de.tcg.jobFinder.service.JobService;
 import de.tcg.jobFinder.service.MyUserDetailsService;
+import de.tcg.jobFinder.specification.JobSpecification;
 
 @Service
 public class JobServiceImpl extends UntilService implements JobService {
@@ -49,14 +59,14 @@ public class JobServiceImpl extends UntilService implements JobService {
 
 	@Override
 	public boolean createExampleJob() {
-		
+
 		return false;
 	}
 
 	@Override
 	public List<Job> getJobs(int limit, String orderBy, String orderType, String search) {
 		List<Job> jobs = jobReposity.findAllWithQuerySearch(orderBy);
-		
+
 		return jobs;
 	}
 
@@ -113,6 +123,15 @@ public class JobServiceImpl extends UntilService implements JobService {
 	@Override
 	public JobTag getJobTagById(long jobTagsId) {
 		return jobTagReposity.findById(jobTagsId);
+	}
+
+	@Override
+	public Page<Job> findAll(JobQuerySearch jobQuerySearch) {
+		JobSpecification jobSpecification =  new JobSpecification(jobQuerySearch);
+		if(jobQuerySearch.getCount() != 0) {
+			return jobReposity.findAll(jobSpecification, PageRequest.of(jobQuerySearch.getPage(), jobQuerySearch.getCount()));
+		}
+		return jobReposity.findAll(jobSpecification, Pageable.unpaged());
 	}
 
 }

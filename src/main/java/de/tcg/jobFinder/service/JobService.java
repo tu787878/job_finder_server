@@ -5,6 +5,9 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.data.domain.Page;
+
+import de.tcg.jobFinder.dto.JobQuerySearch;
 import de.tcg.jobFinder.entity.City;
 import de.tcg.jobFinder.entity.Job;
 import de.tcg.jobFinder.entity.JobCategory;
@@ -29,4 +32,6 @@ public interface JobService {
 	public boolean newjob(HttpServletRequest request, Job job);
 
 	public JobTag getJobTagById(long jobTagsId);
+
+	public Page<Job> findAll(JobQuerySearch jobQuerySearch);
 }
