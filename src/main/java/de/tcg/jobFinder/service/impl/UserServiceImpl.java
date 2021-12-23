@@ -1,15 +1,27 @@
 package de.tcg.jobFinder.service.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import de.tcg.jobFinder.entity.Account;
 import de.tcg.jobFinder.entity.AccountToken;
+import de.tcg.jobFinder.entity.AppliedJob;
+import de.tcg.jobFinder.entity.Job;
+import de.tcg.jobFinder.entity.JobCategory;
 import de.tcg.jobFinder.entity.User;
+import de.tcg.jobFinder.reposity.AppliedJobReposity;
 import de.tcg.jobFinder.reposity.UserReposity;
 import de.tcg.jobFinder.service.AccountTokenService;
 import de.tcg.jobFinder.service.MyUserDetailsService;
@@ -26,6 +38,9 @@ public class UserServiceImpl extends UntilService implements UserService {
 
 	@Autowired
 	private AccountTokenService accountTokenService;
+	
+	@Autowired
+	private AppliedJobReposity appliedJobReposity;
 
 	@Override
 	public List<User> getUsers(HttpServletRequest request) {
@@ -65,5 +80,6 @@ public class UserServiceImpl extends UntilService implements UserService {
 		return false;
 
 	}
+
 
 }

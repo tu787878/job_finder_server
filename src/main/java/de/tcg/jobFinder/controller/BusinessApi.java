@@ -1,5 +1,7 @@
 package de.tcg.jobFinder.controller;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.ResponseEntity;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import de.tcg.jobFinder.dto.ApplyJobRequest;
 import de.tcg.jobFinder.dto.BusinessRequest;
 import de.tcg.jobFinder.dto.JobRequest;
 
@@ -35,5 +38,12 @@ public interface BusinessApi {
 	@GetMapping(value = "/categories", produces = "application/json;charset=UTF-8")
 	public ResponseEntity<?> getCategories(HttpServletRequest request,
 			@RequestParam(name = "businessId", required = false) String businessId);
+	
+	@PutMapping(value = "/appliedJob", produces = "application/json;charset=UTF-8")
+	public ResponseEntity<?> changeStatusRequestedJob(HttpServletRequest request,
+			@RequestBody ApplyJobRequest applyJobRequest);
+	
+	@GetMapping(value = "/appliedJob", produces = "application/json;charset=UTF-8")
+	public ResponseEntity<?> getAppliedJob(HttpServletRequest request, @RequestParam(required = false) Map<String, String> restDTO);
 
 }

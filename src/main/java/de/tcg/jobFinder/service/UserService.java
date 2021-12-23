@@ -1,6 +1,7 @@
 package de.tcg.jobFinder.service;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -13,5 +14,7 @@ public interface UserService {
 	public User getUserById(HttpServletRequest request, String userId);
 
 	public boolean updateUserById(HttpServletRequest request, User user);
+
+	
 
 }

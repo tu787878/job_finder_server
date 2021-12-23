@@ -1,5 +1,7 @@
 package de.tcg.jobFinder.service;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,5 @@ public interface BusinessService {
 	public Business getBusiness(String businessId);
 
 	public BusinessCategory getCategoryById(String businessCategoryId);
-
 
 }

@@ -33,5 +33,7 @@ public interface JobService {
 
 	public JobTag getJobTagById(long jobTagsId);
 
-	public Page<Job> findAll(JobQuerySearch jobQuerySearch);
+	public Map<String, Object> findAll(HttpServletRequest request, JobQuerySearch jobQuerySearch);
+
+	public Map<String, Object> findRelateJob(HttpServletRequest request, int count, int page);
 }

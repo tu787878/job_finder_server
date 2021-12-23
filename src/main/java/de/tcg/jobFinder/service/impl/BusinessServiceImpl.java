@@ -173,6 +173,4 @@ public class BusinessServiceImpl extends UntilService implements BusinessService
 		return businessCategoryReposity.findByBusinessCategoryId(businessCategoryId);
 	}
 
-
-
 }

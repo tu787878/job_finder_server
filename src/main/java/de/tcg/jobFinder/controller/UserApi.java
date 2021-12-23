@@ -1,5 +1,7 @@
 package de.tcg.jobFinder.controller;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.ResponseEntity;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import de.tcg.jobFinder.dto.UserRequest;
 
@@ -24,4 +27,6 @@ public interface UserApi {
 	public ResponseEntity<?> updateUserById(HttpServletRequest request, @PathVariable(name = "userId") String userId,
 			@RequestBody(required = true) UserRequest userRequest);
 
+	@GetMapping(value = "/appliedJob", produces = "application/json;charset=UTF-8")
+	public ResponseEntity<?> getAppliedJob(HttpServletRequest request, @RequestParam(required = false) Map<String, String> restDTO);
 }

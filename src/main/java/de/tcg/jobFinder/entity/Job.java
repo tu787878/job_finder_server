@@ -1,5 +1,6 @@
 package de.tcg.jobFinder.entity;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -15,9 +16,16 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table(name = "job")
-public class Job {
+public class Job implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

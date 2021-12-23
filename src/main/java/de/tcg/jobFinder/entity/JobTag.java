@@ -1,5 +1,6 @@
 package de.tcg.jobFinder.entity;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -15,7 +16,12 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "job_tag")
-public class JobTag {
+public class JobTag  implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

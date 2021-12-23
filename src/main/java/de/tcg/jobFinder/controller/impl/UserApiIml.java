@@ -11,12 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.tcg.jobFinder.controller.UserApi;
 import de.tcg.jobFinder.dto.SuccessResponse;
 import de.tcg.jobFinder.dto.UserRequest;
 import de.tcg.jobFinder.entity.User;
+import de.tcg.jobFinder.service.AppliedJobService;
 import de.tcg.jobFinder.service.JobService;
 import de.tcg.jobFinder.service.UserService;
 
@@ -29,6 +31,9 @@ public class UserApiIml implements UserApi {
 
 	@Autowired
 	JobService jobService;
+	
+	@Autowired
+	AppliedJobService appliedJobService;
 
 	@Override
 	public ResponseEntity<?> getUsers(HttpServletRequest request) {
@@ -76,9 +81,6 @@ public class UserApiIml implements UserApi {
 		user.setAddress(userRequest.getAddress());
 		user.setBirthday(userRequest.getBirthday());
 
-//		TODO: convert json string to list 
-		user.setBusinessCategories(null);
-
 		user.setCity(jobService.getCityById(Long.valueOf(userRequest.getCityId())));
 		user.setDescription(userRequest.getDescription());
 		user.setFirstName(userRequest.getFirstName());
@@ -93,6 +95,30 @@ public class UserApiIml implements UserApi {
 		user.setUserId(userRequest.getUserId());
 
 		return user;
+	}
+
+	@Override
+	public ResponseEntity<?> getAppliedJob(HttpServletRequest request, @RequestParam(required = false) Map<String, String> restDTO) {
+		int count = 0, page = 0;
+		
+		if(restDTO.get("count") != null && restDTO.get("page") != null) {
+			count = Integer.valueOf(restDTO.get("count"));
+			page = Integer.valueOf(restDTO.get("page"));
+		}
+
+		Map<String, Object> jobs = appliedJobService.findAppliedJob(request, count, page);
+
+		Map<String, Object> res = new HashMap<String, Object>();
+		res.put("jobs", jobs.get("jobs"));
+
+		if (count != 0) {
+			res.put("totalPages", jobs.get("totalPages"));
+			res.put("currentPage", jobs.get("currentPage"));
+			res.put("totalCount", jobs.get("totalCount"));
+			res.put("countPerPage", count);
+		}
+
+		return ResponseEntity.ok(new SuccessResponse(0, "success", res));
 	}
 
 }

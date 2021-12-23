@@ -56,10 +56,6 @@ public class User implements Serializable {
 	private int gender;
 
 	@ManyToMany
-	@JoinTable(name = "user_business_category", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "business_category_id"))
-	private Set<BusinessCategory> businessCategories;
-
-	@ManyToMany
 	@JoinTable(name = "user_job_category", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "job_category_id"))
 	private Set<JobCategory> jobCategories;
 
@@ -67,7 +63,7 @@ public class User implements Serializable {
 	private String description;
 
 	public User(String userId, String first_name, String last_name, String birthday, String address, int postCode,
-			City city, int phone, int gender, Set<BusinessCategory> businessCategories, Set<JobCategory> jobCategories,
+			City city, int phone, int gender, Set<JobCategory> jobCategories,
 			String description) {
 		super();
 		this.userId = userId;
@@ -79,7 +75,6 @@ public class User implements Serializable {
 		this.city = city;
 		this.phone = phone;
 		this.gender = gender;
-		this.businessCategories = businessCategories;
 		this.jobCategories = jobCategories;
 		this.description = description;
 	}
@@ -160,14 +155,6 @@ public class User implements Serializable {
 		this.gender = gender;
 	}
 
-	public Set<BusinessCategory> getBusinessCategories() {
-		return businessCategories;
-	}
-
-	public void setBusinessCategories(Set<BusinessCategory> businessCategories) {
-		this.businessCategories = businessCategories;
-	}
-
 	public Set<JobCategory> getJobCategories() {
 		return jobCategories;
 	}
@@ -192,7 +179,7 @@ public class User implements Serializable {
 	public String toString() {
 		return "User [id=" + id + ", userId=" + userId + ", first_name=" + firstName + ", last_name=" + lastName
 				+ ", birthday=" + birthday + ", address=" + address + ", postCode=" + postCode + ", city=" + city
-				+ ", phone=" + phone + ", gender=" + gender + ", businessCategories=" + businessCategories
+				+ ", phone=" + phone + ", gender=" + gender
 				+ ", jobCategories=" + jobCategories + ", description=" + description + "]";
 	}
 
