@@ -22,6 +22,7 @@ import de.tcg.jobFinder.dto.ApplyJobRequest;
 import de.tcg.jobFinder.dto.BusinessRequest;
 import de.tcg.jobFinder.dto.JobRequest;
 import de.tcg.jobFinder.dto.SuccessResponse;
+import de.tcg.jobFinder.entity.Account;
 import de.tcg.jobFinder.entity.Business;
 import de.tcg.jobFinder.entity.BusinessCategory;
 import de.tcg.jobFinder.entity.City;
@@ -70,17 +71,18 @@ public class BusinessApiImpl implements BusinessApi {
 	public ResponseEntity<?> updateBusiness(HttpServletRequest request,
 			@RequestBody(required = true) BusinessRequest businessRequest) {
 		Business business = businessService.getBusiness(businessRequest.getBusinessId());
-		business.setbusinessAdress(businessRequest.getBusinessAddres());
+		business.setbusinessAddress(businessRequest.getBusinessAddress());
 		BusinessCategory businessCategory = businessService.getCategoryById(businessRequest.getBusinessCategoryId());
 		business.setbusinessCategory(businessCategory);
 		business.setbusinessDescription(businessRequest.getBusinessDescription());
 		business.setbusinessName(businessRequest.getBusinessName());
+		System.out.println(business);
 		return businessService.updateBusiness(request, business, businessRequest.getImage());
 	}
 
 	@Override
 	public ResponseEntity<?> newJob(HttpServletRequest request, JobRequest jobRequest) {
-		System.out.println(jobRequest.toString());
+//		System.out.println(jobRequest.toString());
 		Job job = new Job();
 		job.setJobName(jobRequest.getJobName());
 		job.setJobAddress(jobRequest.getJobAddress());
@@ -105,7 +107,7 @@ public class BusinessApiImpl implements BusinessApi {
 		job.setSalaryFrom(Float.parseFloat(jobRequest.getSalaryFrom()));
 		job.setSalaryTo(Float.parseFloat(jobRequest.getSalaryTo()));
 
-		System.out.println(job.toString());
+//		System.out.println(job.toString());
 		
 		List<JobTag> jobTags = new ArrayList<JobTag>();
 		List<String> myList = new ArrayList<String>(Arrays.asList(jobRequest.getJobTagsId().split(",")));
@@ -113,9 +115,9 @@ public class BusinessApiImpl implements BusinessApi {
 			JobTag tag = jobService.getJobTagById(Long.valueOf(l));
 			jobTags.add(tag);
 		}
-		for(JobTag tag : jobTags) {
-			System.out.println(tag.toString());
-		}
+//		for(JobTag tag : jobTags) {
+//			System.out.println(tag.toString());
+//		}
 		Set<JobTag> targetSet = Set.copyOf(jobTags);
 		job.setJobTag(targetSet);
 		
@@ -156,6 +158,24 @@ public class BusinessApiImpl implements BusinessApi {
 		}
 
 		return ResponseEntity.ok(new SuccessResponse(0, "success", res));
+	}
+
+	@Override
+	public ResponseEntity<?> createBusiness(HttpServletRequest request, BusinessRequest businessRequest) {
+		Business business = new Business();
+		business.setbusinessAddress(businessRequest.getBusinessAddress());
+		BusinessCategory businessCategory = businessService.getCategoryById(businessRequest.getBusinessCategoryId());
+		business.setbusinessCategory(businessCategory);
+		business.setbusinessDescription(businessRequest.getBusinessDescription());
+		business.setbusinessName(businessRequest.getBusinessName());
+		
+		Account account = businessService.createBusiness(request, business, businessRequest.getImage());
+		if(account != null) {
+			Map<String, Object> res = new HashMap<String, Object>();
+			res.put("account", account);
+			return ResponseEntity.ok(new SuccessResponse(0, "success", res));
+		}
+		return ResponseEntity.ok(new SuccessResponse(0, "fail", null));
 	}
 
 }

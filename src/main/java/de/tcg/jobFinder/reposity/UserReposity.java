@@ -10,4 +10,6 @@ public interface UserReposity extends JpaRepository<User, Long> {
 
 	User findByUserId(String userId);
 
+	boolean existsByUserId(String userId);
+
 }

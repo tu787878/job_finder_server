@@ -1,5 +1,10 @@
 package de.tcg.jobFinder.service.impl;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,15 +12,19 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import de.tcg.jobFinder.dto.PathId;
 import de.tcg.jobFinder.dto.SuccessResponse;
 import de.tcg.jobFinder.entity.Account;
 import de.tcg.jobFinder.entity.AccountToken;
 import de.tcg.jobFinder.entity.Business;
 import de.tcg.jobFinder.entity.BusinessCategory;
 import de.tcg.jobFinder.entity.Job;
+import de.tcg.jobFinder.reposity.AccountReposity;
 import de.tcg.jobFinder.reposity.BusinessCategoryReposity;
 import de.tcg.jobFinder.reposity.BusinessReposity;
 import de.tcg.jobFinder.reposity.CityReposity;
@@ -38,12 +47,18 @@ public class BusinessServiceImpl extends UntilService implements BusinessService
 
 	@Autowired
 	private JobReposity jobReposity;
-	
+
 	@Autowired
 	private CityReposity cityReposity;
 
 	@Autowired
+	private AccountReposity accountReposity;
+
+	@Autowired
 	private BusinessCategoryReposity businessCategoryReposity;
+
+	@Value("${media.path}")
+	String basisPath;
 
 	@Override
 	public ResponseEntity<?> getBusiness(HttpServletRequest request, String businessId) {
@@ -119,32 +134,29 @@ public class BusinessServiceImpl extends UntilService implements BusinessService
 				if (account.getBusinessId().equals(business.getbusinessId())) {
 					if (imageBase64 != null) {
 						try {
-							// This will decode the String which is encoded by using Base64 class
-//							byte[] imageByte = Base64.decodeBase64(imageBase64);
-//
-//							URL url = this.getClass().getClassLoader().getResource("/statics");
-//							System.out.println(url.toString());
-//							
-//							OutputStream stream = new FileOutputStream("");
-//							stream.write(imageByte);
-							
-							
+							// save logo
+							System.out.println(account.getBusinessId());
+							System.out.println(imageBase64.split(",").length);
+							String pathString = basisPath + "/image" + PathId.upload.getPath();
 
-//							String directory = request.getSession().getServletContext().getRealPath("/")
-//									+ "images/sample.jpg";
-//
-//							if (!Files.exists(Paths.get(directory))) {
-//								System.out.println("not exist");
-//								Files.createFile(Paths.get(directory));
-//							}
-//
-//							new FileOutputStream(directory).write(imageByte);
-//
-//							System.out.println(directory);
-//
-//							business.setbusinessLogoPath(directory);
-//							businessReposity.save(business);
-//							System.out.println(business);
+							byte[] data = Base64.getDecoder().decode(imageBase64.getBytes(StandardCharsets.UTF_8));
+							OutputStream stream;
+
+							String imageName = "/b" + account.getBusinessId().split("_")[1] + ".png";
+
+							try {
+								stream = new FileOutputStream(pathString + imageName);
+								stream.write(data);
+							} catch (IOException e) {
+								System.out.println(e);
+							}
+
+							String baseUrl = ServletUriComponentsBuilder.fromRequestUri(request).replacePath(null)
+									.build().toUriString();
+
+							business.setbusinessLogoPath(baseUrl + "/media/image/upload" + imageName);
+							// System.out.println("http://localhost:8080/media/image/upload" + imageName);
+							System.out.println(business);
 							businessReposity.save(business);
 							return ResponseEntity.ok(new SuccessResponse(0, "success", null));
 						} catch (Exception e) {
@@ -171,6 +183,115 @@ public class BusinessServiceImpl extends UntilService implements BusinessService
 	@Override
 	public BusinessCategory getCategoryById(String businessCategoryId) {
 		return businessCategoryReposity.findByBusinessCategoryId(businessCategoryId);
+	}
+
+	@Override
+	public Account createBusiness(HttpServletRequest request, Business business, String image) {
+		String token = toToken(request);
+		if (token != null) {
+			AccountToken accountToken = accountTokenService.getAccountTokenByAccessToken(token);
+			if (accountToken != null && accountToken.isActive()) {
+				Account account = myUserDetailsService.getAccountByAccountId(accountToken.getAccountId());
+
+				if (account.isBusiness()) {
+					if (account.getBusinessId().equals("")) {
+						String businessId = "";
+						int count = 0;
+						boolean flag = true;
+						do {
+							businessId = "BUSINESS_" + account.getUserName().split("@")[0]
+									+ ((count != 0) ? count : "");
+							flag = businessReposity.existsByBusinessId(businessId);
+							count++;
+						} while (flag);
+
+						// save logo
+						if (image != null) {
+							String pathString = basisPath + "/image" + PathId.upload.getPath();
+
+							byte[] data = Base64.getDecoder()
+									.decode(image.split(",")[1].getBytes(StandardCharsets.UTF_8));
+							OutputStream stream;
+
+							String imageName = "/business_" + businessId.split("_")[1] + ".png";
+
+							try {
+								stream = new FileOutputStream(pathString + imageName);
+								stream.write(data);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+
+							String baseUrl = ServletUriComponentsBuilder.fromRequestUri(request).replacePath(null)
+									.build().toUriString();
+
+							business.setbusinessLogoPath(baseUrl + "/media/image/upload" + imageName);
+						} else {
+							String baseUrl = ServletUriComponentsBuilder.fromRequestUri(request).replacePath(null)
+									.build().toUriString();
+							business.setbusinessLogoPath(baseUrl + "/media/image/sample" + "/business.png");
+						}
+
+						// set link to business
+						business.setbusinessId(businessId);
+						businessReposity.save(business);
+						account.setBusinessId(businessId);
+						accountReposity.save(account);
+
+						return account;
+					} else {
+						boolean check = businessReposity.existsByBusinessId(account.getBusinessId());
+						if (!check) {
+							String businessId = "";
+							int count = 0;
+							boolean flag = true;
+							do {
+								businessId = "BUSINESS_" + account.getUserName().split("@")[0]
+										+ ((count != 0) ? count : "");
+								flag = businessReposity.existsByBusinessId(businessId);
+								count++;
+							} while (flag);
+
+							// save logo
+							if (image != null) {
+								String pathString = basisPath + "/image" + PathId.upload.getPath();
+
+								byte[] data = Base64.getDecoder()
+										.decode(image.split(",")[1].getBytes(StandardCharsets.UTF_8));
+								OutputStream stream;
+
+								String imageName = "/business_" + businessId.split("_")[1] + ".png";
+
+								try {
+									stream = new FileOutputStream(pathString + imageName);
+									stream.write(data);
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+
+								String baseUrl = ServletUriComponentsBuilder.fromRequestUri(request).replacePath(null)
+										.build().toUriString();
+
+								business.setbusinessLogoPath(baseUrl + "/media/image/upload" + imageName);
+							} else {
+								String baseUrl = ServletUriComponentsBuilder.fromRequestUri(request).replacePath(null)
+										.build().toUriString();
+								business.setbusinessLogoPath(baseUrl + "/media/image/sample" + "/business.png");
+							}
+
+							business.setbusinessId(businessId);
+							businessReposity.save(business);
+							account.setBusinessId(businessId);
+							accountReposity.save(account);
+
+							return account;
+						}
+					}
+				}
+			}
+
+		}
+		return null;
 	}
 
 }

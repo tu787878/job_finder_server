@@ -61,10 +61,13 @@ public class User implements Serializable {
 
 	@Column(name = "description")
 	private String description;
+	
+	@Column(name = "avatar")
+	private String avatar;
 
 	public User(String userId, String first_name, String last_name, String birthday, String address, int postCode,
 			City city, int phone, int gender, Set<JobCategory> jobCategories,
-			String description) {
+			String description, String avatar) {
 		super();
 		this.userId = userId;
 		this.firstName = first_name;
@@ -77,6 +80,7 @@ public class User implements Serializable {
 		this.gender = gender;
 		this.jobCategories = jobCategories;
 		this.description = description;
+		this.avatar = avatar;
 	}
 
 	public User() {
@@ -175,12 +179,21 @@ public class User implements Serializable {
 		return id;
 	}
 
+	public String getAvatar() {
+		return avatar;
+	}
+
+	public void setAvatar(String avatar) {
+		this.avatar = avatar;
+	}
+
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", userId=" + userId + ", first_name=" + firstName + ", last_name=" + lastName
+		return "User [id=" + id + ", userId=" + userId + ", firstName=" + firstName + ", lastName=" + lastName
 				+ ", birthday=" + birthday + ", address=" + address + ", postCode=" + postCode + ", city=" + city
-				+ ", phone=" + phone + ", gender=" + gender
-				+ ", jobCategories=" + jobCategories + ", description=" + description + "]";
+				+ ", phone=" + phone + ", gender=" + gender + ", jobCategories=" + jobCategories + ", description="
+				+ description + ", avatar=" + avatar + "]";
 	}
+
 
 }

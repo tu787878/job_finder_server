@@ -1,26 +1,24 @@
 package de.tcg.jobFinder.service.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import de.tcg.jobFinder.dto.PathId;
 import de.tcg.jobFinder.entity.Account;
 import de.tcg.jobFinder.entity.AccountToken;
-import de.tcg.jobFinder.entity.AppliedJob;
-import de.tcg.jobFinder.entity.Job;
-import de.tcg.jobFinder.entity.JobCategory;
 import de.tcg.jobFinder.entity.User;
+import de.tcg.jobFinder.reposity.AccountReposity;
 import de.tcg.jobFinder.reposity.AppliedJobReposity;
 import de.tcg.jobFinder.reposity.UserReposity;
 import de.tcg.jobFinder.service.AccountTokenService;
@@ -38,9 +36,15 @@ public class UserServiceImpl extends UntilService implements UserService {
 
 	@Autowired
 	private AccountTokenService accountTokenService;
-	
+
 	@Autowired
 	private AppliedJobReposity appliedJobReposity;
+
+	@Autowired
+	private AccountReposity accountReposity;
+
+	@Value("${media.path}")
+	String basisPath;
 
 	@Override
 	public List<User> getUsers(HttpServletRequest request) {
@@ -63,7 +67,7 @@ public class UserServiceImpl extends UntilService implements UserService {
 	}
 
 	@Override
-	public boolean updateUserById(HttpServletRequest request, User user) {
+	public boolean updateUserById(HttpServletRequest request, User user, String image) {
 		String token = toToken(request);
 		if (token != null) {
 			AccountToken accountToken = accountTokenService.getAccountTokenByAccessToken(token);
@@ -71,6 +75,29 @@ public class UserServiceImpl extends UntilService implements UserService {
 				Account account = myUserDetailsService.getAccountByAccountId(accountToken.getAccountId());
 				String userId = account.getUserId();
 				if (!account.isBusiness() && userId.equals(user.getUserId())) {
+
+					if (image != null) {
+						// save logo
+						String pathString = basisPath + "/image" + PathId.upload.getPath();
+
+						byte[] data = Base64.getDecoder().decode(image.split(",")[1].getBytes(StandardCharsets.UTF_8));
+						OutputStream stream;
+
+						String imageName = "/user_" + user.getUserId().split("_")[1] + ".png";
+
+						try {
+							stream = new FileOutputStream(pathString + imageName);
+							stream.write(data);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						
+						String baseUrl = ServletUriComponentsBuilder.fromRequestUri(request).replacePath(null)
+								.build().toUriString();
+
+						user.setAvatar(baseUrl + "/media/image/upload" + imageName);
+					}
+
 					userReposity.save(user);
 					return true;
 				}
@@ -81,5 +108,110 @@ public class UserServiceImpl extends UntilService implements UserService {
 
 	}
 
+	@Override
+	public Account createUser(HttpServletRequest request, User user, String image) {
+		String token = toToken(request);
+		if (token != null) {
+			AccountToken accountToken = accountTokenService.getAccountTokenByAccessToken(token);
+			if (accountToken != null && accountToken.isActive()) {
+				Account account = myUserDetailsService.getAccountByAccountId(accountToken.getAccountId());
+
+				if (!account.isBusiness()) {
+					if (account.getUserId().equals("")) {
+						String userId = "";
+						int count = 0;
+						boolean flag = true;
+						do {
+							userId = "USER_" + account.getUserName().split("@")[0] + ((count != 0) ? count : "");
+							flag = userReposity.existsByUserId(userId);
+							count++;
+						} while (flag);
+
+						if (image != null) {
+							// save logo
+							String pathString = basisPath + "/image" + PathId.upload.getPath();
+
+							byte[] data = Base64.getDecoder()
+									.decode(image.split(",")[1].getBytes(StandardCharsets.UTF_8));
+							OutputStream stream;
+
+							String imageName = "/user_" + userId.split("_")[1] + ".png";
+
+							try {
+								stream = new FileOutputStream(pathString + imageName);
+								stream.write(data);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+
+							String baseUrl = ServletUriComponentsBuilder.fromRequestUri(request).replacePath(null)
+									.build().toUriString();
+
+							user.setAvatar(baseUrl + "/media/image/upload" + imageName);
+						} else {
+							String baseUrl = ServletUriComponentsBuilder.fromRequestUri(request).replacePath(null)
+									.build().toUriString();
+							user.setAvatar(baseUrl + "/media/image/sample" + "/user.png");
+						}
+
+						user.setUserId(userId);
+						userReposity.save(user);
+						account.setUserId(userId);
+						accountReposity.save(account);
+
+						return account;
+					} else {
+						boolean check = userReposity.existsByUserId(account.getUserId());
+						if (!check) {
+							String userId = "";
+							int count = 0;
+							boolean flag = true;
+							do {
+								userId = "USER_" + account.getUserName().split("@")[0] + ((count != 0) ? count : "");
+								flag = userReposity.existsByUserId(userId);
+								count++;
+							} while (flag);
+
+							if (image != null) {
+								// save logo
+								String pathString = basisPath + "/image" + PathId.upload.getPath();
+
+								byte[] data = Base64.getDecoder()
+										.decode(image.split(",")[1].getBytes(StandardCharsets.UTF_8));
+								OutputStream stream;
+
+								String imageName = "/user_" + userId.split("_")[1] + ".png";
+
+								try {
+									stream = new FileOutputStream(pathString + imageName);
+									stream.write(data);
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+
+								String baseUrl = ServletUriComponentsBuilder.fromRequestUri(request).replacePath(null)
+										.build().toUriString();
+
+								user.setAvatar(baseUrl + "/media/image/upload" + imageName);
+							} else {
+								String baseUrl = ServletUriComponentsBuilder.fromRequestUri(request).replacePath(null)
+										.build().toUriString();
+								user.setAvatar(baseUrl + "/media/image/sample" + "/user.png");
+							}
+
+							user.setUserId(userId);
+							userReposity.save(user);
+							account.setUserId(userId);
+							accountReposity.save(account);
+
+							return account;
+						}
+					}
+				}
+			}
+
+		}
+		return null;
+	}
 
 }

@@ -31,8 +31,8 @@ public class Business implements Serializable{
 	@Column(name = "businessName")
 	private String businessName;
 
-	@Column(name = "businessAdress")
-	private String businessAdress;
+	@Column(name = "businessAddress")
+	private String businessAddress;
 
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "businessCategoryId", referencedColumnName = "businessCategoryId")
@@ -47,22 +47,22 @@ public class Business implements Serializable{
 	public Business() {
 	}
 
-	public Business(String businessName, String businessAdress,
+	public Business(String businessName, String businessAddress,
 			BusinessCategory businessCategory, String businessDescription, String businessLogoPath) {
 		this.businessId = "B-" + UUID.randomUUID().toString();
 		this.businessName = businessName;
-		this.businessAdress = businessAdress;
+		this.businessAddress = businessAddress;
 		this.businessCategory = businessCategory;
 		this.businessDescription = businessDescription;
 		this.businessLogoPath = businessLogoPath;
 	}
 
-	public Business(String businessId, String businessName, String businessAdress, BusinessCategory businessCategory, String businessDescription,
+	public Business(String businessId, String businessName, String businessAddress, BusinessCategory businessCategory, String businessDescription,
 			String businessLogoPath) {
 		super();
 		this.businessId = businessId;
 		this.businessName = businessName;
-		this.businessAdress = businessAdress;
+		this.businessAddress = businessAddress;
 		this.businessCategory = businessCategory;
 		this.businessDescription = businessDescription;
 		this.businessLogoPath = businessLogoPath;
@@ -84,12 +84,12 @@ public class Business implements Serializable{
 		this.businessName = businessName;
 	}
 
-	public String getbusinessAdress() {
-		return businessAdress;
+	public String getbusinessAddress() {
+		return businessAddress;
 	}
 
-	public void setbusinessAdress(String businessAdress) {
-		this.businessAdress = businessAdress;
+	public void setbusinessAddress(String businessAddress) {
+		this.businessAddress = businessAddress;
 	}
 
 	public BusinessCategory getbusinessCategory() {
@@ -123,7 +123,7 @@ public class Business implements Serializable{
 	@Override
 	public String toString() {
 		return "Business [id=" + id + ", businessId=" + businessId + ", businessName=" + businessName
-				+ ", businessAdress=" + businessAdress + ", businessCategory=" + businessCategory
+				+ ", businessAddress=" + businessAddress + ", businessCategory=" + businessCategory
 				+ ", businessDescription=" + businessDescription + ", businessLogoPath=" + businessLogoPath + "]";
 	}
 

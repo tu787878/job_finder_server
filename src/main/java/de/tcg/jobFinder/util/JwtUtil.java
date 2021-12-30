@@ -1,27 +1,31 @@
 package de.tcg.jobFinder.util;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import de.tcg.jobFinder.entity.Account;
 import de.tcg.jobFinder.entity.AccountToken;
 import de.tcg.jobFinder.exception.ApiRequestException;
+import de.tcg.jobFinder.reposity.AccountReposity;
 import de.tcg.jobFinder.reposity.AccountTokenReposity;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 @Service
 public class JwtUtil {
 	
 	@Autowired
 	private AccountTokenReposity accountTokenReposity;
+	
+	@Autowired
+	private AccountReposity accountReposity;
 
     private String SECRET_KEY = "tudc";
 
@@ -50,8 +54,9 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
     
-    private boolean isTokenValid(String token) {
+    private boolean isTokenValid(String token, String username) {
     	AccountToken accessToken = accountTokenReposity.findByAccessToken(token);
+    	Account account = accountReposity.findByUserName(username);
 		if(token != null && accessToken.isActive()) 
 			return true;
 		
@@ -71,6 +76,6 @@ public class JwtUtil {
 
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && isTokenValid(token));
+        return (username.equals(userDetails.getUsername()) && isTokenValid(token, username));
     }
 }

@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.ResponseEntity;
 
+import de.tcg.jobFinder.entity.Account;
 import de.tcg.jobFinder.entity.Business;
 import de.tcg.jobFinder.entity.BusinessCategory;
 
@@ -23,5 +24,7 @@ public interface BusinessService {
 	public Business getBusiness(String businessId);
 
 	public BusinessCategory getCategoryById(String businessCategoryId);
+
+	public Account createBusiness(HttpServletRequest request, Business business, String image);
 
 }

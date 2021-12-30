@@ -12,7 +12,7 @@ import de.tcg.jobFinder.reposity.AccountReposity;
 import de.tcg.jobFinder.service.MyUserDetailsService;
 
 @Service
-public class MyUserDetailsServiceImpl implements MyUserDetailsService {
+public class MyUserDetailsServiceImpl extends UntilService implements MyUserDetailsService {
 
 	@Autowired
 	private AccountReposity accountReposity;
@@ -25,7 +25,6 @@ public class MyUserDetailsServiceImpl implements MyUserDetailsService {
 		if (account == null)
 			return null;
 		
-		System.out.println(account);
 		AuthorizationAccount authorizationAccount = new AuthorizationAccount(account.getUserName(),
 				account.getPassword(), account.getAccountId(), new ArrayList<Role>(), new ArrayList<String>());
 		authorizationAccount.getAuthorities().add(new Role("user"));
@@ -36,6 +35,27 @@ public class MyUserDetailsServiceImpl implements MyUserDetailsService {
 	@Override
 	public Account getAccountByAccountId(String accountId) {
 		return accountReposity.findByAccountId(accountId);
+	}
+
+	@Override
+	public Account createAccount(Account account) {
+		boolean check = accountReposity.existsByUserName(account.getUserName());
+		if(!check) {
+			String accountId = "";
+			boolean flag = true;
+			int count = 0;
+			do {
+				accountId = account.getUserName().split("@")[0] + ((count != 0) ? count : "");
+				flag = accountReposity.existsByAccountId(accountId);
+				count++;
+			}while(flag);
+			
+			account.setAccountId(accountId);
+			
+			Account newAccount = accountReposity.save(account);
+			return newAccount;
+		}
+		return null;
 	}
 
 }

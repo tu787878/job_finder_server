@@ -26,6 +26,10 @@ public interface BusinessApi {
 	@PutMapping(value = "", produces = "application/json;charset=UTF-8")
 	public ResponseEntity<?> updateBusiness(HttpServletRequest request,
 			@RequestBody(required = true) BusinessRequest businessRequest);
+	
+	@PostMapping(value = "", produces = "application/json;charset=UTF-8")
+	public ResponseEntity<?> createBusiness(HttpServletRequest request,
+			@RequestBody(required = true) BusinessRequest businessRequest);
 
 	@GetMapping(value = "/jobs", produces = "application/json;charset=UTF-8")
 	public ResponseEntity<?> getJobs(HttpServletRequest request,

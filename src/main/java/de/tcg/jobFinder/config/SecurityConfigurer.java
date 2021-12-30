@@ -35,7 +35,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 	public PasswordEncoder passwordEncoder() {
 		return NoOpPasswordEncoder.getInstance();
 	}
-	
+
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(myUserDetailsService);
@@ -46,23 +46,23 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 	public AuthenticationManager authenticationManagerBean() throws Exception {
 		return super.authenticationManagerBean();
 	}
-	
 
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
-		httpSecurity.csrf().disable().authorizeRequests().antMatchers("/authenticate", "/resources/**", "/api-docs", "/docs.html", "/swagger-ui/**").permitAll().anyRequest()
-				.authenticated().and().exceptionHandling().and().sessionManagement()
+		httpSecurity.csrf().disable().authorizeRequests()
+				.antMatchers("/authenticate", "/authenticate/**", "/media/**", "/resources/**", "/api-docs",
+						"/docs.html", "/swagger-ui/**")
+				.permitAll().anyRequest().authenticated().and().exceptionHandling().and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
-		//Exception handling configuration
-		 
-		httpSecurity
-		.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint());
+		// Exception handling configuration
+
+		httpSecurity.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint());
 	}
-	
-    @Bean
-    public AuthenticationEntryPoint authenticationEntryPoint(){
-        return new CustomAuthenticationEntryPoint();
-    }
+
+	@Bean
+	public AuthenticationEntryPoint authenticationEntryPoint() {
+		return new CustomAuthenticationEntryPoint();
+	}
 }

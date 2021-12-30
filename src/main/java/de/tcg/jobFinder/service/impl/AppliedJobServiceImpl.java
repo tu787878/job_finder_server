@@ -1,5 +1,6 @@
 package de.tcg.jobFinder.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,7 +63,7 @@ public class AppliedJobServiceImpl extends UntilService implements AppliedJobSer
 
 						if (!existAppliedJob) {
 
-							AppliedJob appliedJob = new AppliedJob(user, job.getBusiness().getbusinessId(), job, "request");
+							AppliedJob appliedJob = new AppliedJob(user, job.getBusiness().getbusinessId(), job, "request", LocalDateTime.now());
 							appliedJob = appliedJobReposity.save(appliedJob);
 
 							return true;

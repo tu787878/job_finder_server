@@ -5,15 +5,15 @@ import java.io.Serializable;
 public class AuthenticationRequest implements Serializable {
 
 
-    private String username;
+    private String userName;
     private String password;
 
-    public String getUsername() {
-        return username;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUserName(String username) {
+        this.userName = username;
     }
 
     public String getPassword() {
@@ -31,7 +31,7 @@ public class AuthenticationRequest implements Serializable {
     }
 
     public AuthenticationRequest(String username, String password) {
-        this.setUsername(username);
+        this.setUserName(username);
         this.setPassword(password);
     }
 }

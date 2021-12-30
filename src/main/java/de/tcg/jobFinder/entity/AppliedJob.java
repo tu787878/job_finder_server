@@ -1,6 +1,7 @@
 package de.tcg.jobFinder.entity;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,7 +15,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "appliedJob")
-public class AppliedJob  implements Serializable{
+public class AppliedJob implements Serializable {
 
 	/**
 	 * 
@@ -28,7 +29,7 @@ public class AppliedJob  implements Serializable{
 	@ManyToOne()
 	@JoinColumn(name = "userId")
 	private User userId;
-	
+
 	@Column(name = "businessId")
 	private String businessId;
 
@@ -39,21 +40,26 @@ public class AppliedJob  implements Serializable{
 	@Column(name = "status")
 	private String status;
 
-	public AppliedJob(Long id, User userId, String businessId, Job job, String status) {
+	@Column(name = "dateTime", columnDefinition = "TIMESTAMP")
+	private LocalDateTime dateTime;
+
+	public AppliedJob(Long id, User userId, String businessId, Job job, String status, LocalDateTime dateTime) {
 		super();
 		this.id = id;
 		this.userId = userId;
 		this.businessId = businessId;
 		this.job = job;
 		this.status = status;
+		this.dateTime = dateTime;
 	}
-	
-	public AppliedJob(User userId, String businessId, Job job, String status) {
+
+	public AppliedJob(User userId, String businessId, Job job, String status, LocalDateTime dateTime) {
 		super();
 		this.userId = userId;
 		this.businessId = businessId;
 		this.job = job;
 		this.status = status;
+		this.dateTime = dateTime;
 	}
 
 	public AppliedJob() {
@@ -95,10 +101,18 @@ public class AppliedJob  implements Serializable{
 		this.businessId = businessId;
 	}
 
+	public LocalDateTime getDateTime() {
+		return dateTime;
+	}
+
+	public void setDateTime(LocalDateTime dateTime) {
+		this.dateTime = dateTime;
+	}
+
 	@Override
 	public String toString() {
 		return "AppliedJob [id=" + id + ", userId=" + userId + ", businessId=" + businessId + ", job=" + job
-				+ ", status=" + status + "]";
+				+ ", status=" + status + ", dateTime=" + dateTime + "]";
 	}
 
 }

@@ -1,9 +1,11 @@
 package de.tcg.jobFinder.controller.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -17,6 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 import de.tcg.jobFinder.controller.UserApi;
 import de.tcg.jobFinder.dto.SuccessResponse;
 import de.tcg.jobFinder.dto.UserRequest;
+import de.tcg.jobFinder.entity.Account;
+import de.tcg.jobFinder.entity.JobCategory;
+import de.tcg.jobFinder.entity.JobTag;
 import de.tcg.jobFinder.entity.User;
 import de.tcg.jobFinder.service.AppliedJobService;
 import de.tcg.jobFinder.service.JobService;
@@ -64,11 +69,11 @@ public class UserApiIml implements UserApi {
 	}
 
 	@Override
-	public ResponseEntity<?> updateUserById(HttpServletRequest request, String userId,
-			@RequestBody(required = true) UserRequest userRequest) {
+	public ResponseEntity<?> updateUser(HttpServletRequest request,
+			@RequestBody(required = false) UserRequest userRequest) {
 		User user = userRequestToUser(userRequest);
 
-		boolean result = userService.updateUserById(request, user);
+		boolean result = userService.updateUserById(request, user, userRequest.getAvatar());
 
 		if (result) {
 			return ResponseEntity.ok(new SuccessResponse(0, "success", null));
@@ -86,8 +91,13 @@ public class UserApiIml implements UserApi {
 		user.setFirstName(userRequest.getFirstName());
 		user.setGender(Integer.valueOf(userRequest.getGender()));
 
-//		TODO: convert json string to list 
-		user.setJobCategories(null);
+		List<JobCategory> jobCategories = new ArrayList<JobCategory>();
+		List<String> myList = new ArrayList<String>(Arrays.asList(userRequest.getJobCategoryIds().split(",")));
+		for (String l : myList) {
+			JobCategory jobCategory = jobService.getJobCategoryById(Long.valueOf(l)); 
+			jobCategories.add(jobCategory);
+		}
+		user.setJobCategories(Set.copyOf(jobCategories));
 
 		user.setLastName(userRequest.getLastName());
 		user.setPhone(Integer.valueOf(userRequest.getPhone()));
@@ -119,6 +129,19 @@ public class UserApiIml implements UserApi {
 		}
 
 		return ResponseEntity.ok(new SuccessResponse(0, "success", res));
+	}
+
+	@Override
+	public ResponseEntity<?> createUser(HttpServletRequest request, @RequestBody(required = false) UserRequest userRequest) {
+		User user = userRequestToUser(userRequest);
+		Account account = userService.createUser(request, user, userRequest.getAvatar());
+		//System.out.println("ok");
+		if(account != null) {
+			Map<String, Object> res = new HashMap<String, Object>();
+			res.put("account", account);
+			return ResponseEntity.ok(new SuccessResponse(0, "success", res));
+		}
+		return ResponseEntity.ok(new SuccessResponse(0, "fail", null));
 	}
 
 }

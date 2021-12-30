@@ -120,8 +120,16 @@ public class JobServiceImpl extends UntilService implements JobService {
 				Business business = businessReposity.findByBusinessId(businessId);
 
 				job.setBusiness(business);
-				job.setJobId("JOB_" + generateRandomId(10));
-				System.out.println(job);
+
+				String jobId;
+				boolean flag = true;
+				do {
+					jobId = "JOB_" + account.getAccountId() + generateRandomId(5);
+					flag = jobReposity.existsByJobId(jobId);
+				}while(flag);
+				
+				job.setJobId(jobId);
+				
 				jobReposity.save(job);
 				return true;
 			}

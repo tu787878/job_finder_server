@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import de.tcg.jobFinder.entity.Account;
 import de.tcg.jobFinder.entity.User;
 
 public interface UserService {
@@ -13,7 +14,9 @@ public interface UserService {
 
 	public User getUserById(HttpServletRequest request, String userId);
 
-	public boolean updateUserById(HttpServletRequest request, User user);
+	public boolean updateUserById(HttpServletRequest request, User user, String image);
+
+	public Account createUser(HttpServletRequest request, User user, String image);
 
 	
 

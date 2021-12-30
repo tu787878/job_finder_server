@@ -8,5 +8,7 @@ import de.tcg.jobFinder.entity.Business;
 @Repository
 public interface BusinessReposity extends JpaRepository<Business, Long> {
 	public Business findByBusinessId(String businessId);
+
+	public boolean existsByBusinessId(String businessId);
 	
 }

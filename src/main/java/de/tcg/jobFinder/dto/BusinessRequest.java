@@ -3,18 +3,18 @@ package de.tcg.jobFinder.dto;
 public class BusinessRequest {
 	private String businessId;
 	private String businessName;
-	private String businessAddres;
+	private String businessAddress;
 	private String businessCategoryId;
 	private String businessDescription;
 	private String image;
 	
 	public BusinessRequest() {}
 
-	public BusinessRequest(String businessId, String businessName, String businessAddres, String businessCategoryId,
+	public BusinessRequest(String businessId, String businessName, String businessAddress, String businessCategoryId,
 			String businessDescription, String image) {
 		this.businessId = businessId;
 		this.businessName = businessName;
-		this.businessAddres = businessAddres;
+		this.businessAddress = businessAddress;
 		this.businessCategoryId = businessCategoryId;
 		this.businessDescription = businessDescription;
 		this.image = image;
@@ -36,12 +36,12 @@ public class BusinessRequest {
 		this.businessName = businessName;
 	}
 
-	public String getBusinessAddres() {
-		return businessAddres;
+	public String getBusinessAddress() {
+		return businessAddress;
 	}
 
-	public void setBusinessAddres(String businessAddres) {
-		this.businessAddres = businessAddres;
+	public void setBusinessAddres(String businessAddress) {
+		this.businessAddress = businessAddress;
 	}
 
 	public String getBusinessCategoryId() {
@@ -70,8 +70,8 @@ public class BusinessRequest {
 
 	@Override
 	public String toString() {
-		return "BusinessRequest [businessId=" + businessId + ", businessName=" + businessName + ", businessAddres="
-				+ businessAddres + ", businessCategoryId=" + businessCategoryId + ", businessDescription="
+		return "BusinessRequest [businessId=" + businessId + ", businessName=" + businessName + ", businessAddress="
+				+ businessAddress + ", businessCategoryId=" + businessCategoryId + ", businessDescription="
 				+ businessDescription + ", image=" + image + "]";
 	};
 

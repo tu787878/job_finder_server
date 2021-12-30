@@ -1,10 +1,5 @@
 package de.tcg.jobFinder.dto;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import de.tcg.jobFinder.entity.User;
-import de.tcg.jobFinder.reposity.CityReposity;
-
 public class UserRequest {
 	private String userId;
 	private String firstName;
@@ -18,10 +13,11 @@ public class UserRequest {
 	private String businessCategoryIds;
 	private String jobCategoryIds;
 	private String description;
+	private String avatar;
 
 	public UserRequest(String userId, String firstName, String lastName, String birthday, String address, int postCode,
 			String cityId, String phone, String gender, String businessCategoryIds, String jobCategoryIds,
-			String description) {
+			String description, String avatar) {
 		super();
 		this.userId = userId;
 		this.firstName = firstName;
@@ -35,6 +31,7 @@ public class UserRequest {
 		this.businessCategoryIds = businessCategoryIds;
 		this.jobCategoryIds = jobCategoryIds;
 		this.description = description;
+		this.avatar = avatar;
 	}
 
 	public String getFirstName() {
@@ -133,12 +130,21 @@ public class UserRequest {
 		this.userId = userId;
 	}
 
+	public String getAvatar() {
+		return avatar;
+	}
+
+	public void setAvatar(String avatar) {
+		this.avatar = avatar;
+	}
+
 	@Override
 	public String toString() {
 		return "UserRequest [userId=" + userId + ", firstName=" + firstName + ", lastName=" + lastName + ", birthday="
 				+ birthday + ", address=" + address + ", postCode=" + postCode + ", cityId=" + cityId + ", phone="
 				+ phone + ", gender=" + gender + ", businessCategoryIds=" + businessCategoryIds + ", jobCategoryIds="
-				+ jobCategoryIds + ", description=" + description + "]";
+				+ jobCategoryIds + ", description=" + description + ", avatar=" + avatar + "]";
 	}
+
 
 }

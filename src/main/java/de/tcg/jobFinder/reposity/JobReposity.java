@@ -32,4 +32,6 @@ public interface JobReposity extends JpaRepository<Job, Long>, JpaSpecificationE
 
 	Job findByJobId(String jobId);
 
+	boolean existsByJobId(String jobId);
+
 }

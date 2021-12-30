@@ -27,6 +27,9 @@ public class Account {
 	@Column(name="password")
 	private String password;
 	
+	@Column(name="active")
+	boolean isActive;
+	
 	
 	@Column(name = "lastUsed", columnDefinition="DATETIME")
 	@Temporal(TemporalType.TIMESTAMP)
@@ -42,7 +45,7 @@ public class Account {
 	private String userId;
 
 	public Account(String accountId, String userName, String password, Date lastUsed, boolean isBusiness,
-			String businessId, String userId) {
+			String businessId, String userId, boolean isActive) {
 		super();
 		this.accountId = accountId;
 		this.userName = userName;
@@ -51,6 +54,7 @@ public class Account {
 		this.isBusiness = isBusiness;
 		this.businessId = businessId;
 		this.userId = userId;
+		this.isActive = isActive;
 	}
 	
 	public Account() {
@@ -117,11 +121,19 @@ public class Account {
 		return id;
 	}
 
+	public boolean isActive() {
+		return isActive;
+	}
+
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
+	}
+
 	@Override
 	public String toString() {
 		return "Account [id=" + id + ", accountId=" + accountId + ", userName=" + userName + ", password=" + password
-				+ ", lastUsed=" + lastUsed + ", isBusiness=" + isBusiness + ", businessId=" + businessId + ", userId="
-				+ userId + "]";
+				+ ", isActive=" + isActive + ", lastUsed=" + lastUsed + ", isBusiness=" + isBusiness + ", businessId="
+				+ businessId + ", userId=" + userId + "]";
 	}
 	
 	

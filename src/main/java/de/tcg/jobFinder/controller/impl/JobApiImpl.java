@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import de.tcg.jobFinder.entity.Job;
 import de.tcg.jobFinder.entity.JobCategory;
 import de.tcg.jobFinder.entity.JobTag;
 import de.tcg.jobFinder.service.AppliedJobService;
+import de.tcg.jobFinder.service.impl.EmailServiceImpl;
 
 @RestController
 @RequestMapping("/api/jobs")
@@ -33,6 +35,9 @@ public class JobApiImpl implements JobApi {
 
 	@Autowired
 	AppliedJobService appliedJobService;
+	
+	@Autowired
+	EmailServiceImpl emailServiceImpl;
 
 	@Override
 	public ResponseEntity<?> createJob() {
@@ -144,10 +149,13 @@ public class JobApiImpl implements JobApi {
 	}
 
 	@Override
-	public ResponseEntity<?> applyJob(HttpServletRequest request, ApplyJobRequest applyJobRequest) {
+	public ResponseEntity<?> applyJob(HttpServletRequest request, ApplyJobRequest applyJobRequest) throws MessagingException {
 		boolean result = appliedJobService.applyJob(request, applyJobRequest);
-		if (result)
+		if (result) {
+			emailServiceImpl.sendMail(null, "ApplyJobToBusiness");
 			return ResponseEntity.ok(new SuccessResponse(0, "success", null));
+		}
+			
 		return ResponseEntity.ok(new SuccessResponse(1, "faild", null));
 	}
 

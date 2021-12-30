@@ -2,6 +2,7 @@ package de.tcg.jobFinder.controller;
 
 import java.util.Map;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,7 @@ public interface JobApi {
 	public ResponseEntity<?> getJobTags();
 	
 	@PostMapping(value="/apply",produces = "application/json;charset=UTF-8")
-	public ResponseEntity<?> applyJob(HttpServletRequest request, @RequestBody ApplyJobRequest applyJobRequest);
+	public ResponseEntity<?> applyJob(HttpServletRequest request, @RequestBody ApplyJobRequest applyJobRequest) throws MessagingException;
 	
 	@DeleteMapping(value="/disApply",produces = "application/json;charset=UTF-8")
 	public ResponseEntity<?> disApplyJob(HttpServletRequest request, @RequestBody ApplyJobRequest applyJobRequest);
