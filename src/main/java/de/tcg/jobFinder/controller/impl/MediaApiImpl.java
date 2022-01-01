@@ -38,6 +38,7 @@ public class MediaApiImpl implements MediaApi {
 		try {
 			bytes = Files.readAllBytes(file.toPath());
 		} catch (IOException e) {
+			System.out.println(e);
 			throw new ApiRequestException("No such file in server");
 		}
 
