@@ -169,6 +169,14 @@ public class JobServiceImpl extends UntilService implements JobService {
 					map.put("currentPage", jobs.getNumber());
 					map.put("totalCount", jobs.getTotalElements());
 					return map;
+				}else {
+					Map<String, Object> map = new HashMap<String, Object>();
+					List<Map<String, Object>> list = additionalInformationJob(null, jobs.getContent(), false);
+					map.put("jobs", list);
+					map.put("totalPages", jobs.getTotalPages());
+					map.put("currentPage", jobs.getNumber());
+					map.put("totalCount", jobs.getTotalElements());
+					return map;
 				}
 
 			}
@@ -294,5 +302,37 @@ public class JobServiceImpl extends UntilService implements JobService {
 		}
 
 		return maps;
+	}
+
+	@Override
+	public Map<String, Object> findJobByBusiness(String businessid, int count, int page) {
+		
+		Business business = businessReposity.findByBusinessId(businessid);
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		
+		if(business != null) {
+			Page<Job> jobs = null;
+			if (count > 0) {
+				jobs = jobReposity.findByBusiness(business,
+						PageRequest.of(page, count));
+			} else {
+				jobs = jobReposity.findByBusiness(business,
+						Pageable.unpaged());
+			}
+
+			List<Map<String, Object>> list = additionalInformationJob(null, jobs.getContent(), false);
+			
+			map.put("jobs", list);
+			map.put("totalPages", jobs.getTotalPages());
+			map.put("currentPage", jobs.getNumber());
+			map.put("totalCount", jobs.getTotalElements());
+
+			return map;
+		}else {
+			return null;
+		}
+		
+		
 	}
 }

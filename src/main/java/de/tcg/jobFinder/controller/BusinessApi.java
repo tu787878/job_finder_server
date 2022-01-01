@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,9 +32,9 @@ public interface BusinessApi {
 	public ResponseEntity<?> createBusiness(HttpServletRequest request,
 			@RequestBody(required = true) BusinessRequest businessRequest);
 
-	@GetMapping(value = "/jobs", produces = "application/json;charset=UTF-8")
-	public ResponseEntity<?> getJobs(HttpServletRequest request,
-			@RequestParam(name = "businessId", required = false) String businessId);
+	@GetMapping(value = "/{businessId}/jobs", produces = "application/json;charset=UTF-8")
+	public ResponseEntity<?> getJobs(@PathVariable(name = "businessId") String businessid,
+			@RequestParam(required = false) Map<String, String> restDTO);
 	
 	@PostMapping(value = "/jobs", produces = "application/json;charset=UTF-8")
 	public ResponseEntity<?> newJob(HttpServletRequest request,

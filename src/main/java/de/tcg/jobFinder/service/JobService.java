@@ -36,4 +36,6 @@ public interface JobService {
 	public Map<String, Object> findAll(HttpServletRequest request, JobQuerySearch jobQuerySearch);
 
 	public Map<String, Object> findRelateJob(HttpServletRequest request, int count, int page);
+
+	public Map<String, Object> findJobByBusiness(String businessid, int count, int page);
 }

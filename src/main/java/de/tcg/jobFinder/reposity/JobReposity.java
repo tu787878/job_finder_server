@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import de.tcg.jobFinder.entity.Business;
 import de.tcg.jobFinder.entity.Job;
 import de.tcg.jobFinder.entity.JobCategory;
 
@@ -29,6 +30,8 @@ public interface JobReposity extends JpaRepository<Job, Long>, JpaSpecificationE
 	List<Job> findAll(Specification<Job> spec);
 	
 	Page<Job> findByJobCategoryIn(Set<JobCategory> jobCategories, Pageable pageable);
+	
+	Page<Job> findByBusiness(Business business, Pageable pageable);
 
 	Job findByJobId(String jobId);
 

@@ -73,7 +73,6 @@ public class JobSpecification implements Specification<Job>{
 			}
 		}
 		
-		
 		return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
 	}
 

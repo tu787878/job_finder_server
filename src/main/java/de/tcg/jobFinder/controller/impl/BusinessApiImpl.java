@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,8 +43,8 @@ public class BusinessApiImpl implements BusinessApi {
 
 	@Autowired
 	JobService jobService;
-	
-	@Autowired 
+
+	@Autowired
 	AppliedJobService appliedJobService;
 
 	@Override
@@ -54,10 +55,33 @@ public class BusinessApiImpl implements BusinessApi {
 	}
 
 	@Override
-	public ResponseEntity<?> getJobs(HttpServletRequest request,
-			@RequestParam(name = "businessId", required = false) String businessId) {
+	public ResponseEntity<?> getJobs(@PathVariable(name = "businessId") String businessid,
+			@RequestParam(required = false) Map<String, String> restDTO) {
 
-		return businessService.getJobs(request, businessId, true);
+		int count = 0, page = 0;
+
+		if (restDTO.get("count") != null && restDTO.get("page") != null) {
+			count = Integer.valueOf(restDTO.get("count"));
+			page = Integer.valueOf(restDTO.get("page"));
+		}
+
+		Map<String, Object> jobs = jobService.findJobByBusiness(businessid, count, page);
+		
+		if(jobs != null) {
+			Map<String, Object> res = new HashMap<String, Object>();
+			res.put("jobs", jobs.get("jobs"));
+
+			if (count != 0) {
+				res.put("totalPages", jobs.get("totalPages"));
+				res.put("currentPage", jobs.get("currentPage"));
+				res.put("totalCount", jobs.get("totalCount"));
+				res.put("countPerPage", count);
+			}
+
+			return ResponseEntity.ok(new SuccessResponse(0, "success", res));
+		}
+
+		return ResponseEntity.ok(new SuccessResponse(1, "fail", null));
 	}
 
 	@Override
@@ -82,7 +106,7 @@ public class BusinessApiImpl implements BusinessApi {
 
 	@Override
 	public ResponseEntity<?> newJob(HttpServletRequest request, JobRequest jobRequest) {
-//		System.out.println(jobRequest.toString());
+		System.out.println(jobRequest);
 		Job job = new Job();
 		job.setJobName(jobRequest.getJobName());
 		job.setJobAddress(jobRequest.getJobAddress());
@@ -108,7 +132,7 @@ public class BusinessApiImpl implements BusinessApi {
 		job.setSalaryTo(Float.parseFloat(jobRequest.getSalaryTo()));
 
 //		System.out.println(job.toString());
-		
+
 		List<JobTag> jobTags = new ArrayList<JobTag>();
 		List<String> myList = new ArrayList<String>(Arrays.asList(jobRequest.getJobTagsId().split(",")));
 		for (String l : myList) {
@@ -120,8 +144,6 @@ public class BusinessApiImpl implements BusinessApi {
 //		}
 		Set<JobTag> targetSet = Set.copyOf(jobTags);
 		job.setJobTag(targetSet);
-		
-		
 
 		if (jobService.newjob(request, job))
 			return ResponseEntity.ok(new SuccessResponse(0, "success", null));
@@ -132,15 +154,17 @@ public class BusinessApiImpl implements BusinessApi {
 	@Override
 	public ResponseEntity<?> changeStatusRequestedJob(HttpServletRequest request, ApplyJobRequest applyJobRequest) {
 		boolean result = appliedJobService.changeStatusRequestedJob(request, applyJobRequest);
-		if(result) return ResponseEntity.ok(new SuccessResponse(0, "success", null));
+		if (result)
+			return ResponseEntity.ok(new SuccessResponse(0, "success", null));
 		return ResponseEntity.ok(new SuccessResponse(1, "faild", null));
 	}
-	
+
 	@Override
-	public ResponseEntity<?> getAppliedJob(HttpServletRequest request, @RequestParam(required = false) Map<String, String> restDTO) {
+	public ResponseEntity<?> getAppliedJob(HttpServletRequest request,
+			@RequestParam(required = false) Map<String, String> restDTO) {
 		int count = 0, page = 0;
-		
-		if(restDTO.get("count") != null && restDTO.get("page") != null) {
+
+		if (restDTO.get("count") != null && restDTO.get("page") != null) {
 			count = Integer.valueOf(restDTO.get("count"));
 			page = Integer.valueOf(restDTO.get("page"));
 		}
@@ -168,9 +192,9 @@ public class BusinessApiImpl implements BusinessApi {
 		business.setbusinessCategory(businessCategory);
 		business.setbusinessDescription(businessRequest.getBusinessDescription());
 		business.setbusinessName(businessRequest.getBusinessName());
-		
+
 		Account account = businessService.createBusiness(request, business, businessRequest.getImage());
-		if(account != null) {
+		if (account != null) {
 			Map<String, Object> res = new HashMap<String, Object>();
 			res.put("account", account);
 			return ResponseEntity.ok(new SuccessResponse(0, "success", res));
