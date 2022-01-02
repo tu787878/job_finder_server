@@ -1,40 +1,36 @@
 package de.tcg.jobFinder.template.email;
 
-import de.tcg.jobFinder.entity.Business;
-import de.tcg.jobFinder.entity.Job;
-import de.tcg.jobFinder.entity.User;
+import de.tcg.jobFinder.entity.AppliedJob;
 
-public class ApplyJobToBusiness {
-	private User user;
-	private Business business;
-	private Job job;
-	public ApplyJobToBusiness(User user, Business business, Job job) {
-		super();
-		this.user = user;
-		this.business = business;
-		this.job = job;
+public class ApplyJobToBusiness extends CommonEmailInformation {
+	private String businessEmail;
+	private AppliedJob appliedJob;
+
+	public ApplyJobToBusiness(String businessEmail, AppliedJob appliedJob) {
+		super(businessEmail, "", TemplateName.APPLIEDJOBTOBUSINESS.getName());
+		this.businessEmail = businessEmail;
+		this.appliedJob = appliedJob;
 	}
-	public User getUser() {
-		return user;
+
+	public String getBusinessEmail() {
+		return businessEmail;
 	}
-	public void setUser(User user) {
-		this.user = user;
+
+	public void setBusinessEmail(String businessEmail) {
+		this.businessEmail = businessEmail;
 	}
-	public Business getBusiness() {
-		return business;
+
+	public AppliedJob getAppliedJob() {
+		return appliedJob;
 	}
-	public void setBusiness(Business business) {
-		this.business = business;
+
+	public void setAppliedJob(AppliedJob appliedJob) {
+		this.appliedJob = appliedJob;
 	}
-	public Job getJob() {
-		return job;
-	}
-	public void setJob(Job job) {
-		this.job = job;
-	}
+
 	@Override
 	public String toString() {
-		return "ApplyJobToBusiness [user=" + user + ", business=" + business + ", job=" + job + "]";
+		return "ApplyJobToBusiness [businessEmail=" + businessEmail + ", appliedJob=" + appliedJob + "]";
 	}
 
 }

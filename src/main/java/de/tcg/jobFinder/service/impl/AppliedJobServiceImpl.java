@@ -12,7 +12,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import de.tcg.jobFinder.dto.ApplyJobRequest;
 import de.tcg.jobFinder.entity.Account;
 import de.tcg.jobFinder.entity.AccountToken;
 import de.tcg.jobFinder.entity.AppliedJob;
@@ -44,26 +43,25 @@ public class AppliedJobServiceImpl extends UntilService implements AppliedJobSer
 	private AppliedJobReposity appliedJobReposity;
 
 	@Override
-	public boolean applyJob(HttpServletRequest request, ApplyJobRequest applyJobRequest) {
+	public boolean applyJob(HttpServletRequest request, String userId, String jobId) {
 		String token = toToken(request);
 		if (token != null) {
 			AccountToken accountToken = accountTokenService.getAccountTokenByAccessToken(token);
 			if (accountToken != null && accountToken.isActive()) {
 
 				Account account = myUserDetailsService.getAccountByAccountId(accountToken.getAccountId());
-		
 
-				if (!account.isBusiness()) {
+				if (!account.isBusiness() && userId.equals(account.getUserId())) {
 					User user = userReposity.findByUserId(account.getUserId());
-					Job job = jobReposity.findByJobId(applyJobRequest.getJobId());
+					Job job = jobReposity.findByJobId(jobId);
 
 					if (job != null) {
-						boolean existAppliedJob = appliedJobReposity.existsByUserIdAndJobId(user,
-								job.getId());
+						boolean existAppliedJob = appliedJobReposity.existsByUserIdAndJobId(user, job.getId());
 
 						if (!existAppliedJob) {
 
-							AppliedJob appliedJob = new AppliedJob(user, job.getBusiness().getbusinessId(), job, "request", LocalDateTime.now());
+							AppliedJob appliedJob = new AppliedJob(user, job.getBusiness().getbusinessId(), job,
+									"request", LocalDateTime.now());
 							appliedJob = appliedJobReposity.save(appliedJob);
 
 							return true;
@@ -80,7 +78,7 @@ public class AppliedJobServiceImpl extends UntilService implements AppliedJobSer
 	}
 
 	@Override
-	public boolean disApplyJob(HttpServletRequest request, ApplyJobRequest applyJobRequest) {
+	public boolean disApplyJob(HttpServletRequest request, String userId, String jobId) {
 		String token = toToken(request);
 		if (token != null) {
 			AccountToken accountToken = accountTokenService.getAccountTokenByAccessToken(token);
@@ -88,17 +86,15 @@ public class AppliedJobServiceImpl extends UntilService implements AppliedJobSer
 
 				Account account = myUserDetailsService.getAccountByAccountId(accountToken.getAccountId());
 
-				if (!account.isBusiness()) {
+				if (!account.isBusiness() && userId.equals(account.getUserId())) {
 					User user = userReposity.findByUserId(account.getUserId());
-					Job job = jobReposity.findByJobId(applyJobRequest.getJobId());
+					Job job = jobReposity.findByJobId(jobId);
 
 					if (job != null) {
-						boolean existAppliedJob = appliedJobReposity.existsByUserIdAndJobId(user,
-								job.getId());
+						boolean existAppliedJob = appliedJobReposity.existsByUserIdAndJobId(user, job.getId());
 
 						if (existAppliedJob) {
-							AppliedJob appliedJob = appliedJobReposity.findByUserIdAndJobId(user,
-									job.getId());
+							AppliedJob appliedJob = appliedJobReposity.findByUserIdAndJobId(user, job.getId());
 							appliedJobReposity.delete(appliedJob);
 							return true;
 						}
@@ -113,7 +109,7 @@ public class AppliedJobServiceImpl extends UntilService implements AppliedJobSer
 	}
 
 	@Override
-	public boolean changeStatusRequestedJob(HttpServletRequest request, ApplyJobRequest applyJobRequest) {
+	public boolean changeStatusRequestedJob(HttpServletRequest request, String businessId, String jobId, String status) {
 		String token = toToken(request);
 		if (token != null) {
 			AccountToken accountToken = accountTokenService.getAccountTokenByAccessToken(token);
@@ -121,18 +117,16 @@ public class AppliedJobServiceImpl extends UntilService implements AppliedJobSer
 
 				Account account = myUserDetailsService.getAccountByAccountId(accountToken.getAccountId());
 
-				if (account.isBusiness()) {
+				if (account.isBusiness() && account.getBusinessId().equals(businessId)) {
 					User user = userReposity.findByUserId(account.getUserId());
-					Job job = jobReposity.findByJobId(applyJobRequest.getJobId());
+					Job job = jobReposity.findByJobId(jobId);
 
 					if (job != null && job.getBusiness().getbusinessId().equals(account.getBusinessId())) {
-						boolean existAppliedJob = appliedJobReposity.existsByUserIdAndJobId(user,
-								job.getId());
+						boolean existAppliedJob = appliedJobReposity.existsByUserIdAndJobId(user, job.getId());
 
 						if (existAppliedJob) {
-							AppliedJob appliedJob = appliedJobReposity.findByUserIdAndJobId(user,
-									job.getId());
-							appliedJob.setStatus(applyJobRequest.getStatus());
+							AppliedJob appliedJob = appliedJobReposity.findByUserIdAndJobId(user, job.getId());
+							appliedJob.setStatus(status);
 							appliedJobReposity.save(appliedJob);
 							return true;
 						}
@@ -145,9 +139,9 @@ public class AppliedJobServiceImpl extends UntilService implements AppliedJobSer
 
 		return false;
 	}
-	
+
 	@Override
-	public Map<String, Object> findAppliedJob(HttpServletRequest request, int count, int page) {
+	public Map<String, Object> findAppliedJob(HttpServletRequest request, String id, int count, int page) {
 		String token = toToken(request);
 		if (token != null) {
 			AccountToken accountToken = accountTokenService.getAccountTokenByAccessToken(token);
@@ -155,7 +149,7 @@ public class AppliedJobServiceImpl extends UntilService implements AppliedJobSer
 				Account account = myUserDetailsService.getAccountByAccountId(accountToken.getAccountId());
 				Map<String, Object> map = new HashMap<String, Object>();
 
-				if (!account.isBusiness()) {
+				if (!account.isBusiness() && id.equals(account.getUserId())) {
 					User user = userReposity.findByUserId(account.getUserId());
 					Page<AppliedJob> jobs = null;
 					if (count > 0) {
@@ -164,8 +158,7 @@ public class AppliedJobServiceImpl extends UntilService implements AppliedJobSer
 						jobs = appliedJobReposity.findByUserId(user, Pageable.unpaged());
 					}
 
-					if(jobs != null) {
-						System.out.println(jobs);
+					if (jobs != null) {
 						map.put("jobs", jobs.getContent());
 						map.put("totalPages", jobs.getTotalPages());
 						map.put("currentPage", jobs.getNumber());
@@ -174,22 +167,25 @@ public class AppliedJobServiceImpl extends UntilService implements AppliedJobSer
 
 					return map;
 				} else {
+					if (id.equals(account.getBusinessId())) {
+						Page<AppliedJob> jobs = null;
 
-					Page<AppliedJob> jobs = null;
-					if (count > 0) {
-						jobs = appliedJobReposity.findByBusinessId(account.getBusinessId(), PageRequest.of(page, count));
-					} else {
-						jobs = appliedJobReposity.findByBusinessId(account.getBusinessId(), Pageable.unpaged());
+						if (count > 0) {
+							jobs = appliedJobReposity.findByBusinessId(account.getBusinessId(),
+									PageRequest.of(page, count));
+						} else {
+							jobs = appliedJobReposity.findByBusinessId(account.getBusinessId(), Pageable.unpaged());
+						}
+
+						if (jobs != null) {
+							map.put("jobs", jobs.getContent());
+							map.put("totalPages", jobs.getTotalPages());
+							map.put("currentPage", jobs.getNumber());
+							map.put("totalCount", jobs.getTotalElements());
+						}
+
+						return map;
 					}
-
-					if(jobs != null) {
-						map.put("jobs", jobs.getContent());
-						map.put("totalPages", jobs.getTotalPages());
-						map.put("currentPage", jobs.getNumber());
-						map.put("totalCount", jobs.getTotalElements());
-					}
-
-					return map;
 				}
 
 			}

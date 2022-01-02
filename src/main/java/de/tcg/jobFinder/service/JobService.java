@@ -29,13 +29,17 @@ public interface JobService {
 
 	public JobCategory getJobCategoryById(long jobCategoryId);
 
-	public boolean newjob(HttpServletRequest request, Job job);
+	public boolean newjob(HttpServletRequest request, String businessId, Job job);
 
 	public JobTag getJobTagById(long jobTagsId);
 
 	public Map<String, Object> findAll(HttpServletRequest request, JobQuerySearch jobQuerySearch);
 
-	public Map<String, Object> findRelateJob(HttpServletRequest request, int count, int page);
+	public Map<String, Object> findRelateJob(HttpServletRequest request, String id,  int count, int page);
 
 	public Map<String, Object> findJobByBusiness(String businessid, int count, int page);
+
+	public Map<String, Object> findByJobId(HttpServletRequest request, String jobId);
+
+	public boolean deleteJob(HttpServletRequest request, String businessId, String jobId);
 }

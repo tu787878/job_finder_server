@@ -109,29 +109,30 @@ public class JobServiceImpl extends UntilService implements JobService {
 	}
 
 	@Override
-	public boolean newjob(HttpServletRequest request, Job job) {
+	public boolean newjob(HttpServletRequest request, String businessId, Job job) {
 		String token = toToken(request);
-		String businessId;
 		if (token != null) {
 			AccountToken accountToken = accountTokenService.getAccountTokenByAccessToken(token);
 			if (accountToken != null && accountToken.isActive()) {
 				Account account = myUserDetailsService.getAccountByAccountId(accountToken.getAccountId());
-				businessId = account.getBusinessId();
-				Business business = businessReposity.findByBusinessId(businessId);
 
-				job.setBusiness(business);
+				if (account.isBusiness() && account.getBusinessId().equals(businessId)) {
+					Business business = businessReposity.findByBusinessId(businessId);
 
-				String jobId;
-				boolean flag = true;
-				do {
-					jobId = "JOB_" + account.getAccountId() + generateRandomId(5);
-					flag = jobReposity.existsByJobId(jobId);
-				}while(flag);
-				
-				job.setJobId(jobId);
-				
-				jobReposity.save(job);
-				return true;
+					job.setBusiness(business);
+
+					String jobId;
+					boolean flag = true;
+					do {
+						jobId = "JOB_" + account.getAccountId() + generateRandomId(5);
+						flag = jobReposity.existsByJobId(jobId);
+					} while (flag);
+
+					job.setJobId(jobId);
+
+					jobReposity.save(job);
+					return true;
+				}
 			}
 		}
 
@@ -169,7 +170,7 @@ public class JobServiceImpl extends UntilService implements JobService {
 					map.put("currentPage", jobs.getNumber());
 					map.put("totalCount", jobs.getTotalElements());
 					return map;
-				}else {
+				} else {
 					Map<String, Object> map = new HashMap<String, Object>();
 					List<Map<String, Object>> list = additionalInformationJob(null, jobs.getContent(), false);
 					map.put("jobs", list);
@@ -193,7 +194,7 @@ public class JobServiceImpl extends UntilService implements JobService {
 	}
 
 	@Override
-	public Map<String, Object> findRelateJob(HttpServletRequest request, int count, int page) {
+	public Map<String, Object> findRelateJob(HttpServletRequest request, String id, int count, int page) {
 		String token = toToken(request);
 		if (token != null) {
 			AccountToken accountToken = accountTokenService.getAccountTokenByAccessToken(token);
@@ -201,7 +202,7 @@ public class JobServiceImpl extends UntilService implements JobService {
 				Account account = myUserDetailsService.getAccountByAccountId(accountToken.getAccountId());
 				Map<String, Object> map = new HashMap<String, Object>();
 
-				if (!account.isBusiness()) {
+				if (!account.isBusiness() && id.equals(account.getUserId())) {
 					User user = userReposity.findByUserId(account.getUserId());
 					// TODO: get jobCategories by User
 					Set<JobCategory> jobCategories = userReposity.findByUserId(account.getUserId()).getJobCategories();
@@ -223,27 +224,31 @@ public class JobServiceImpl extends UntilService implements JobService {
 					return map;
 				} else {
 
-					// TODO: get jobCategories from businessCategory from business
-					List<JobCategory> jobCategories = jobCategoryReposity.findByBusinessCategoryId(businessReposity
-							.findByBusinessId(account.getBusinessId()).getbusinessCategory().getBusinessCategoryId());
+					if (id.equals(account.getBusinessId())) {
+						// TODO: get jobCategories from businessCategory from business
+						List<JobCategory> jobCategories = jobCategoryReposity
+								.findByBusinessCategoryId(businessReposity.findByBusinessId(account.getBusinessId())
+										.getbusinessCategory().getBusinessCategoryId());
 
-					// TODO: get job by jobCategories (with Page)
-					Page<Job> jobs = null;
-					if (count > 0) {
-						jobs = jobReposity.findByJobCategoryIn(new HashSet<JobCategory>(jobCategories),
-								PageRequest.of(page, count));
-					} else {
-						jobs = jobReposity.findByJobCategoryIn(new HashSet<JobCategory>(jobCategories),
-								Pageable.unpaged());
+						// TODO: get job by jobCategories (with Page)
+						Page<Job> jobs = null;
+						if (count > 0) {
+							jobs = jobReposity.findByJobCategoryIn(new HashSet<JobCategory>(jobCategories),
+									PageRequest.of(page, count));
+						} else {
+							jobs = jobReposity.findByJobCategoryIn(new HashSet<JobCategory>(jobCategories),
+									Pageable.unpaged());
+						}
+
+						List<Map<String, Object>> list = additionalInformationJob(null, jobs.getContent(), false);
+						map.put("jobs", list);
+						map.put("totalPages", jobs.getTotalPages());
+						map.put("currentPage", jobs.getNumber());
+						map.put("totalCount", jobs.getTotalElements());
+
+						return map;
 					}
 
-					List<Map<String, Object>> list = additionalInformationJob(null, jobs.getContent(), false);
-					map.put("jobs", list);
-					map.put("totalPages", jobs.getTotalPages());
-					map.put("currentPage", jobs.getNumber());
-					map.put("totalCount", jobs.getTotalElements());
-
-					return map;
 				}
 
 			}
@@ -306,33 +311,88 @@ public class JobServiceImpl extends UntilService implements JobService {
 
 	@Override
 	public Map<String, Object> findJobByBusiness(String businessid, int count, int page) {
-		
+
 		Business business = businessReposity.findByBusinessId(businessid);
 		Map<String, Object> map = new HashMap<String, Object>();
-		
-		
-		if(business != null) {
+
+		if (business != null) {
 			Page<Job> jobs = null;
 			if (count > 0) {
-				jobs = jobReposity.findByBusiness(business,
-						PageRequest.of(page, count));
+				jobs = jobReposity.findByBusiness(business, PageRequest.of(page, count));
 			} else {
-				jobs = jobReposity.findByBusiness(business,
-						Pageable.unpaged());
+				jobs = jobReposity.findByBusiness(business, Pageable.unpaged());
 			}
 
 			List<Map<String, Object>> list = additionalInformationJob(null, jobs.getContent(), false);
-			
+
 			map.put("jobs", list);
 			map.put("totalPages", jobs.getTotalPages());
 			map.put("currentPage", jobs.getNumber());
 			map.put("totalCount", jobs.getTotalElements());
 
 			return map;
-		}else {
+		} else {
 			return null;
 		}
-		
-		
+
+	}
+
+	@Override
+	public Map<String, Object> findByJobId(HttpServletRequest request, String jobId) {
+
+		String token = toToken(request);
+		if (token != null) {
+			AccountToken accountToken = accountTokenService.getAccountTokenByAccessToken(token);
+			if (accountToken != null && accountToken.isActive()) {
+				Account account = myUserDetailsService.getAccountByAccountId(accountToken.getAccountId());
+				Map<String, Object> map = new HashMap<String, Object>();
+
+				if (!account.isBusiness()) {
+					User user = userReposity.findByUserId(account.getUserId());
+					Job job = jobReposity.findByJobId(jobId);
+					List<Job> jobs = new ArrayList<Job>();
+					jobs.add(job);
+					List<Map<String, Object>> list = additionalInformationJob(user, jobs, true);
+					map.put("jobs", list.get(0));
+
+					return map;
+				} else {
+
+					Job job = jobReposity.findByJobId(jobId);
+					List<Job> jobs = new ArrayList<Job>();
+					jobs.add(job);
+					List<Map<String, Object>> list = additionalInformationJob(null, jobs, false);
+					map.put("jobs", list.get(0));
+
+					return map;
+				}
+
+			}
+
+		}
+
+		return null;
+	}
+
+	@Override
+	public boolean deleteJob(HttpServletRequest request, String businessId, String jobId) {
+		String token = toToken(request);
+		if (token != null) {
+			AccountToken accountToken = accountTokenService.getAccountTokenByAccessToken(token);
+			if (accountToken != null && accountToken.isActive()) {
+				Account account = myUserDetailsService.getAccountByAccountId(accountToken.getAccountId());
+
+				if (account.isBusiness() && businessId.equals(account.getBusinessId())) {
+					Job job = jobReposity.findByJobId(jobId);
+
+					jobReposity.delete(job);
+
+					return true;
+				}
+			}
+
+		}
+
+		return false;
 	}
 }

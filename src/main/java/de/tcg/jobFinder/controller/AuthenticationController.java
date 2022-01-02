@@ -109,6 +109,7 @@ public class AuthenticationController {
 	@RequestMapping(value = "/authenticate/checkToken", method = RequestMethod.GET)
 	public ResponseEntity<?> checkToken(HttpServletRequest request) {
 		final String authorizationHeader = request.getHeader("Authorization");
+		@SuppressWarnings("unused")
 		String username = null;
 		String jwt = null;
 

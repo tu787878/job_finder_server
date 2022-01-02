@@ -27,7 +27,6 @@ import de.tcg.jobFinder.entity.Job;
 import de.tcg.jobFinder.reposity.AccountReposity;
 import de.tcg.jobFinder.reposity.BusinessCategoryReposity;
 import de.tcg.jobFinder.reposity.BusinessReposity;
-import de.tcg.jobFinder.reposity.CityReposity;
 import de.tcg.jobFinder.reposity.JobReposity;
 import de.tcg.jobFinder.service.AccountTokenService;
 import de.tcg.jobFinder.service.BusinessService;
@@ -49,9 +48,6 @@ public class BusinessServiceImpl extends UntilService implements BusinessService
 	private JobReposity jobReposity;
 
 	@Autowired
-	private CityReposity cityReposity;
-
-	@Autowired
 	private AccountReposity accountReposity;
 
 	@Autowired
@@ -61,24 +57,9 @@ public class BusinessServiceImpl extends UntilService implements BusinessService
 	String basisPath;
 
 	@Override
-	public ResponseEntity<?> getBusiness(HttpServletRequest request, String businessId) {
-		String token = toToken(request);
-		if (token != null) {
-			AccountToken accountToken = accountTokenService.getAccountTokenByAccessToken(token);
-			if (accountToken != null && accountToken.isActive()) {
-				if (businessId == null) {
-					Account account = myUserDetailsService.getAccountByAccountId(accountToken.getAccountId());
-					businessId = account.getBusinessId();
-				}
-				Business business = businessReposity.findByBusinessId(businessId);
-				Map<String, Object> res = new HashMap<String, Object>();
-
-				res.put("business", business);
-				return ResponseEntity.ok(new SuccessResponse(0, "success", res));
-			}
-		}
-
-		return ResponseEntity.ok(new SuccessResponse(1, "failed", null));
+	public Business getBusiness(String businessId) {
+		Business business = businessReposity.findByBusinessId(businessId);
+		return business;
 	}
 
 	@Override
@@ -103,28 +84,13 @@ public class BusinessServiceImpl extends UntilService implements BusinessService
 	}
 
 	@Override
-	public ResponseEntity<?> getCategories(HttpServletRequest request, String businessId) {
-		String token = toToken(request);
-		if (token != null) {
-			AccountToken accountToken = accountTokenService.getAccountTokenByAccessToken(token);
-			if (accountToken != null && accountToken.isActive()) {
-				if (businessId == null) {
-					Account account = myUserDetailsService.getAccountByAccountId(accountToken.getAccountId());
-					businessId = account.getBusinessId();
-				}
-				List<BusinessCategory> businessCategories = businessCategoryReposity.findAll();
-				Map<String, Object> res = new HashMap<String, Object>();
-
-				res.put("businessCategories", businessCategories);
-				return ResponseEntity.ok(new SuccessResponse(0, "success", res));
-			}
-		}
-
-		return ResponseEntity.ok(new SuccessResponse(1, "failed", null));
+	public List<BusinessCategory> getCategories(HttpServletRequest request) {
+		List<BusinessCategory> businessCategories = businessCategoryReposity.findAll();
+		return businessCategories;
 	}
 
 	@Override
-	public ResponseEntity<?> updateBusiness(HttpServletRequest request, Business business, String imageBase64) {
+	public boolean updateBusiness(HttpServletRequest request, Business business, String imageBase64) {
 		String token = toToken(request);
 		if (token != null) {
 			AccountToken accountToken = accountTokenService.getAccountTokenByAccessToken(token);
@@ -155,29 +121,22 @@ public class BusinessServiceImpl extends UntilService implements BusinessService
 									.build().toUriString();
 
 							business.setbusinessLogoPath(baseUrl + "/media/image/upload" + imageName);
-							// System.out.println("http://localhost:8080/media/image/upload" + imageName);
-							System.out.println(business);
 							businessReposity.save(business);
-							return ResponseEntity.ok(new SuccessResponse(0, "success", null));
+							return true;
 						} catch (Exception e) {
 							businessReposity.save(business);
-							return ResponseEntity.ok(new SuccessResponse(0, e.toString(), null));
+							return false;
 						}
 					} else {
 						businessReposity.save(business);
-						return ResponseEntity.ok(new SuccessResponse(0, "success", null));
+						return true;
 					}
 
 				}
 			}
 		}
 
-		return ResponseEntity.ok(new SuccessResponse(1, "failed", null));
-	}
-
-	@Override
-	public Business getBusiness(String businessId) {
-		return businessReposity.findByBusinessId(businessId);
+		return false;
 	}
 
 	@Override
@@ -292,6 +251,24 @@ public class BusinessServiceImpl extends UntilService implements BusinessService
 
 		}
 		return null;
+	}
+
+	@Override
+	public boolean deleteBusiness(HttpServletRequest request, String businessId) {
+		String token = toToken(request);
+		if (token != null) {
+			AccountToken accountToken = accountTokenService.getAccountTokenByAccessToken(token);
+			if (accountToken != null && accountToken.isActive()) {
+				Account account = myUserDetailsService.getAccountByAccountId(accountToken.getAccountId());
+				if (account.isBusiness() && businessId.equals(account.getUserId())) {
+					Business business = businessReposity.findByBusinessId(businessId);
+					businessReposity.delete(business);
+					return true;
+				}
+			}
+
+		}
+		return false;
 	}
 
 }

@@ -51,7 +51,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity.csrf().disable().authorizeRequests()
 				.antMatchers("/authenticate", "/authenticate/**", "/media/**", "/resources/**", "/api-docs",
-						"/docs.html", "/swagger-ui/**")
+						"/docs.html", "/swagger-ui/**", "/swagger-ui.html")
 				.permitAll().anyRequest().authenticated().and().exceptionHandling().and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

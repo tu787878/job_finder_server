@@ -19,7 +19,6 @@ import de.tcg.jobFinder.entity.Account;
 import de.tcg.jobFinder.entity.AccountToken;
 import de.tcg.jobFinder.entity.User;
 import de.tcg.jobFinder.reposity.AccountReposity;
-import de.tcg.jobFinder.reposity.AppliedJobReposity;
 import de.tcg.jobFinder.reposity.UserReposity;
 import de.tcg.jobFinder.service.AccountTokenService;
 import de.tcg.jobFinder.service.MyUserDetailsService;
@@ -38,32 +37,21 @@ public class UserServiceImpl extends UntilService implements UserService {
 	private AccountTokenService accountTokenService;
 
 	@Autowired
-	private AppliedJobReposity appliedJobReposity;
-
-	@Autowired
 	private AccountReposity accountReposity;
 
 	@Value("${media.path}")
 	String basisPath;
 
 	@Override
-	public List<User> getUsers(HttpServletRequest request) {
+	public List<User> getUsers() {
 
 		return userReposity.findAll();
 	}
 
 	@Override
-	public User getUserById(HttpServletRequest request, String userId) {
-		String token = toToken(request);
-		if (token != null) {
-			AccountToken accountToken = accountTokenService.getAccountTokenByAccessToken(token);
-			if (accountToken != null && accountToken.isActive()) {
-				User user = userReposity.findByUserId(userId);
-				return user;
-			}
-		}
-
-		return null;
+	public User getUserById(String userId) {
+		User user = userReposity.findByUserId(userId);
+		return user;
 	}
 
 	@Override
@@ -91,9 +79,9 @@ public class UserServiceImpl extends UntilService implements UserService {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-						
-						String baseUrl = ServletUriComponentsBuilder.fromRequestUri(request).replacePath(null)
-								.build().toUriString();
+
+						String baseUrl = ServletUriComponentsBuilder.fromRequestUri(request).replacePath(null).build()
+								.toUriString();
 
 						user.setAvatar(baseUrl + "/media/image/upload" + imageName);
 					}
@@ -151,7 +139,12 @@ public class UserServiceImpl extends UntilService implements UserService {
 						} else {
 							String baseUrl = ServletUriComponentsBuilder.fromRequestUri(request).replacePath(null)
 									.build().toUriString();
-							user.setAvatar(baseUrl + "/media/image/sample" + "/user.png");
+							if (user.getGender() == 1) {
+								user.setAvatar(baseUrl + "/media/image/sample" + "/avatar01.png");
+							} else {
+								user.setAvatar(baseUrl + "/media/image/sample" + "/avatar02.png");
+							}
+
 						}
 
 						user.setUserId(userId);
@@ -211,6 +204,31 @@ public class UserServiceImpl extends UntilService implements UserService {
 			}
 
 		}
+		return null;
+	}
+
+	@Override
+	public boolean deleteUser(HttpServletRequest request, String userId) {
+		String token = toToken(request);
+		if (token != null) {
+			AccountToken accountToken = accountTokenService.getAccountTokenByAccessToken(token);
+			if (accountToken != null && accountToken.isActive()) {
+				Account account = myUserDetailsService.getAccountByAccountId(accountToken.getAccountId());
+				if (!account.isBusiness() && userId.equals(account.getUserId())) {
+					User user = userReposity.findByUserId(userId);
+					userReposity.delete(user);
+					return true;
+				}
+			}
+
+		}
+		return false;
+	}
+
+	@Override
+	public String getEmailUserById(String userId) {
+		Account account = accountReposity.findByUserId(userId);
+		if(account != null) return account.getUserName();
 		return null;
 	}
 

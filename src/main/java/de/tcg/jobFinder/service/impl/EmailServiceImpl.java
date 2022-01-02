@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import de.tcg.jobFinder.template.email.CommonEmailInformation;
+
 @Service
 public class EmailServiceImpl {
 	 private final TemplateEngine templateEngine;
@@ -19,16 +21,16 @@ public class EmailServiceImpl {
 	        this.javaMailSender = javaMailSender;
 	    }
 
-	    public String sendMail(Object object, String templateName) throws MessagingException {
+	    public String sendMail(CommonEmailInformation information) throws MessagingException {
 	        Context context = new Context();
-	        context.setVariable("user", "test");
+	        context.setVariable("data", information);
 
-	        String process = templateEngine.process("emails/" + templateName, context);
+	        String process = templateEngine.process("emails/" + information.getTemplateEmail(), context);
 	        javax.mail.internet.MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 	        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
-	        helper.setSubject("Welcome " + "test");
+	        helper.setSubject(information.getSubtitle());
 	        helper.setText(process, true);
-	        helper.setTo("vantu7849@gmail.com");
+	        helper.setTo(information.getEmailTo());
 	        javaMailSender.send(mimeMessage);
 	        return "Sent";
 	    }

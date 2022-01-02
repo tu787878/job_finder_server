@@ -14,4 +14,6 @@ public interface AccountReposity extends JpaRepository<Account, Long> {
 	public boolean existsByUserName(String userName);
 
 	public boolean existsByAccountId(String accountId);
+
+	public Account findByUserId(String userId);
 }

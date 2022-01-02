@@ -55,8 +55,7 @@ public class MediaApiImpl implements MediaApi {
 		File file = new File(pathString + "/test.png");
 		byte[] bytes = Files.readAllBytes(file.toPath());
 		
-		emailServiceImpl.sendMail(null, "ApplyJobToBusiness");
-
+		
 		return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(bytes);
 	}
 
