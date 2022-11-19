@@ -43,7 +43,7 @@ public class AppliedJobServiceImpl extends UntilService implements AppliedJobSer
 	private AppliedJobReposity appliedJobReposity;
 
 	@Override
-	public boolean applyJob(HttpServletRequest request, String userId, String jobId) {
+	public AppliedJob applyJob(HttpServletRequest request, String userId, String jobId) {
 		String token = toToken(request);
 		if (token != null) {
 			AccountToken accountToken = accountTokenService.getAccountTokenByAccessToken(token);
@@ -64,17 +64,17 @@ public class AppliedJobServiceImpl extends UntilService implements AppliedJobSer
 									"request", LocalDateTime.now());
 							appliedJob = appliedJobReposity.save(appliedJob);
 
-							return true;
+							return appliedJob;
 						}
 					}
 
-					return false;
+					return null;
 
 				}
 			}
 		}
 
-		return false;
+		return null;
 	}
 
 	@Override

@@ -4,8 +4,10 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import de.tcg.jobFinder.entity.AppliedJob;
+
 public interface AppliedJobService {
-	public boolean applyJob(HttpServletRequest request, String userId, String id);
+	public AppliedJob applyJob(HttpServletRequest request, String userId, String id);
 
 	public boolean disApplyJob(HttpServletRequest request, String userId, String jobId);
 

@@ -55,7 +55,7 @@ public class User implements Serializable {
 	@Column(name = "gender")
 	private int gender;
 
-	@ManyToMany
+	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "user_job_category", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "job_category_id"))
 	private Set<JobCategory> jobCategories;
 

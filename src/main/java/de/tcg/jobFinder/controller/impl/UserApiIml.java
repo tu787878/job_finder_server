@@ -3,9 +3,9 @@ package de.tcg.jobFinder.controller.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -22,13 +22,15 @@ import de.tcg.jobFinder.controller.UserApi;
 import de.tcg.jobFinder.dto.SuccessResponse;
 import de.tcg.jobFinder.dto.UserRequest;
 import de.tcg.jobFinder.entity.Account;
+import de.tcg.jobFinder.entity.AppliedJob;
 import de.tcg.jobFinder.entity.JobCategory;
 import de.tcg.jobFinder.entity.User;
+import de.tcg.jobFinder.exception.ApiRequestException;
 import de.tcg.jobFinder.service.AppliedJobService;
 import de.tcg.jobFinder.service.JobService;
 import de.tcg.jobFinder.service.UserService;
 import de.tcg.jobFinder.service.impl.EmailServiceImpl;
-import de.tcg.jobFinder.template.email.TemplateName;
+import de.tcg.jobFinder.template.email.ApplyJobToBusiness;
 
 @RestController
 @RequestMapping("/api/user")
@@ -42,7 +44,7 @@ public class UserApiIml implements UserApi {
 
 	@Autowired
 	AppliedJobService appliedJobService;
-	
+
 	@Autowired
 	EmailServiceImpl emailServiceImpl;
 
@@ -81,7 +83,7 @@ public class UserApiIml implements UserApi {
 		}
 		return ResponseEntity.ok(new SuccessResponse(1, "failed", null));
 	}
-	
+
 	@Override
 	public ResponseEntity<?> createUser(HttpServletRequest request,
 			@RequestBody(required = false) UserRequest userRequest) {
@@ -108,7 +110,6 @@ public class UserApiIml implements UserApi {
 		}
 		return ResponseEntity.ok(new SuccessResponse(1, "failed", null));
 	}
-	
 
 	@Override
 	public ResponseEntity<?> deleteUser(HttpServletRequest request, String userId) {
@@ -148,17 +149,17 @@ public class UserApiIml implements UserApi {
 		return ResponseEntity.ok(new SuccessResponse(0, "success", res));
 	}
 
-
 	@Override
 	public ResponseEntity<?> applyJob(HttpServletRequest request, Map<String, String> restDTO, String userId,
 			String jobId) throws MessagingException {
-		boolean result = appliedJobService.applyJob(request, userId, jobId);
-		if (result) {
+		AppliedJob result = appliedJobService.applyJob(request, userId, jobId);
+		if (result != null) {
 			String userMail = userService.getEmailUserById(userId);
-			//emailServiceImpl.sendMail(null, TemplateName.APPLIEDJOBTOBUSINESS, "Bạn có một yêu cầu mới!", user.);
+			ApplyJobToBusiness applyJobToBusiness = new ApplyJobToBusiness(userMail, result);
+			emailServiceImpl.sendMail(applyJobToBusiness);
 			return ResponseEntity.ok(new SuccessResponse(0, "success", null));
 		}
-			
+
 		return ResponseEntity.ok(new SuccessResponse(1, "faild", null));
 	}
 
@@ -203,6 +204,9 @@ public class UserApiIml implements UserApi {
 	 */
 	public User userRequestToUser(UserRequest userRequest) {
 		User user = new User();
+		if(!userRequest.getUserId().equals("")) 
+			user = userService.getUserById(userRequest.getUserId());
+		if(user == null) throw new ApiRequestException("user isn't exist");
 		user.setAddress(userRequest.getAddress());
 		user.setBirthday(userRequest.getBirthday());
 
@@ -217,13 +221,12 @@ public class UserApiIml implements UserApi {
 			JobCategory jobCategory = jobService.getJobCategoryById(Long.valueOf(l));
 			jobCategories.add(jobCategory);
 		}
-		user.setJobCategories(Set.copyOf(jobCategories));
+		user.setJobCategories(new HashSet<JobCategory>(jobCategories));
 
 		user.setLastName(userRequest.getLastName());
 		user.setPhone(Integer.valueOf(userRequest.getPhone()));
-		user.setPostCode(userRequest.getPostCode());
-		user.setUserId(userRequest.getUserId());
-
+		user.setPostCode(Integer.valueOf(userRequest.getPostCode()));
+		System.out.println(user);
 		return user;
 	}
 }

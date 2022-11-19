@@ -30,6 +30,8 @@ public interface JobService {
 	public JobCategory getJobCategoryById(long jobCategoryId);
 
 	public boolean newjob(HttpServletRequest request, String businessId, Job job);
+	
+	public boolean updateJob(HttpServletRequest request, String businessId, Job job);
 
 	public JobTag getJobTagById(long jobTagsId);
 
@@ -42,4 +44,6 @@ public interface JobService {
 	public Map<String, Object> findByJobId(HttpServletRequest request, String jobId);
 
 	public boolean deleteJob(HttpServletRequest request, String businessId, String jobId);
+
+	public Job getjobByJobId(String jobId);
 }

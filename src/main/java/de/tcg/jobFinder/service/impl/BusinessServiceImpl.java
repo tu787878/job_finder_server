@@ -98,7 +98,7 @@ public class BusinessServiceImpl extends UntilService implements BusinessService
 				Account account = myUserDetailsService.getAccountByAccountId(accountToken.getAccountId());
 
 				if (account.getBusinessId().equals(business.getbusinessId())) {
-					if (imageBase64 != null) {
+					if (!imageBase64.equals("")) {
 						try {
 							// save logo
 							System.out.println(account.getBusinessId());
@@ -145,7 +145,7 @@ public class BusinessServiceImpl extends UntilService implements BusinessService
 	}
 
 	@Override
-	public Account createBusiness(HttpServletRequest request, Business business, String image) {
+	public Account createBusiness(HttpServletRequest request, Business business, String imageBase64) {
 		String token = toToken(request);
 		if (token != null) {
 			AccountToken accountToken = accountTokenService.getAccountTokenByAccessToken(token);
@@ -165,11 +165,10 @@ public class BusinessServiceImpl extends UntilService implements BusinessService
 						} while (flag);
 
 						// save logo
-						if (image != null) {
+						if (!imageBase64.equals("")) {
 							String pathString = basisPath + "/image" + PathId.upload.getPath();
 
-							byte[] data = Base64.getDecoder()
-									.decode(image.split(",")[1].getBytes(StandardCharsets.UTF_8));
+							byte[] data = Base64.getDecoder().decode(imageBase64.getBytes(StandardCharsets.UTF_8));
 							OutputStream stream;
 
 							String imageName = "/business_" + businessId.split("_")[1] + ".png";
@@ -212,11 +211,10 @@ public class BusinessServiceImpl extends UntilService implements BusinessService
 							} while (flag);
 
 							// save logo
-							if (image != null) {
+							if (!imageBase64.equals("")) {
 								String pathString = basisPath + "/image" + PathId.upload.getPath();
 
-								byte[] data = Base64.getDecoder()
-										.decode(image.split(",")[1].getBytes(StandardCharsets.UTF_8));
+								byte[] data = Base64.getDecoder().decode(imageBase64.getBytes(StandardCharsets.UTF_8));
 								OutputStream stream;
 
 								String imageName = "/business_" + businessId.split("_")[1] + ".png";

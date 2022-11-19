@@ -59,8 +59,10 @@ public class AuthenticationController {
 		AccountToken accountToken = new AccountToken(userDetails.getAccountId(), jwt, true);
 		accountTokenService.saveAccountToken(accountToken);
 
-		Map<String, String> res = new HashMap<String, String>();
+		Map<String, Object> res = new HashMap<String, Object>();
 		res.put("token", jwt);
+		Account account = myUserDetailsService.getAccountByAccountId(accountToken.getAccountId());
+		res.put("account", account);
 		return ResponseEntity.ok(new SuccessResponse(0, "success", res));
 	}
 	
@@ -88,6 +90,7 @@ public class AuthenticationController {
 			accountTokenService.saveAccountToken(accountToken);
 			
 			res.put("token", accountToken.getAccessToken());
+			
 			return ResponseEntity.ok(new SuccessResponse(0, "success", res));
 		}
 		

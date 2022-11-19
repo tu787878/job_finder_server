@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 
 import org.springframework.http.HttpStatus;
 
-import com.google.api.client.util.DateTime;
-
 public class ApiException {
 	
 	private final String message;

@@ -63,12 +63,11 @@ public class UserServiceImpl extends UntilService implements UserService {
 				Account account = myUserDetailsService.getAccountByAccountId(accountToken.getAccountId());
 				String userId = account.getUserId();
 				if (!account.isBusiness() && userId.equals(user.getUserId())) {
-
-					if (image != null) {
+					if (!image.equals("")) {
 						// save logo
 						String pathString = basisPath + "/image" + PathId.upload.getPath();
 
-						byte[] data = Base64.getDecoder().decode(image.split(",")[1].getBytes(StandardCharsets.UTF_8));
+						byte[] data = Base64.getDecoder().decode(image.getBytes(StandardCharsets.UTF_8));
 						OutputStream stream;
 
 						String imageName = "/user_" + user.getUserId().split("_")[1] + ".png";
@@ -85,7 +84,7 @@ public class UserServiceImpl extends UntilService implements UserService {
 
 						user.setAvatar(baseUrl + "/media/image/upload" + imageName);
 					}
-
+					System.out.println(user);
 					userReposity.save(user);
 					return true;
 				}
@@ -115,12 +114,11 @@ public class UserServiceImpl extends UntilService implements UserService {
 							count++;
 						} while (flag);
 
-						if (image != null) {
+						if (!image.equals("")) {
 							// save logo
 							String pathString = basisPath + "/image" + PathId.upload.getPath();
 
-							byte[] data = Base64.getDecoder()
-									.decode(image.split(",")[1].getBytes(StandardCharsets.UTF_8));
+							byte[] data = Base64.getDecoder().decode(image.getBytes(StandardCharsets.UTF_8));
 							OutputStream stream;
 
 							String imageName = "/user_" + userId.split("_")[1] + ".png";
@@ -165,12 +163,11 @@ public class UserServiceImpl extends UntilService implements UserService {
 								count++;
 							} while (flag);
 
-							if (image != null) {
+							if (!image.equals("")) {
 								// save logo
 								String pathString = basisPath + "/image" + PathId.upload.getPath();
 
-								byte[] data = Base64.getDecoder()
-										.decode(image.split(",")[1].getBytes(StandardCharsets.UTF_8));
+								byte[] data = Base64.getDecoder().decode(image.getBytes(StandardCharsets.UTF_8));
 								OutputStream stream;
 
 								String imageName = "/user_" + userId.split("_")[1] + ".png";

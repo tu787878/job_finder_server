@@ -6,7 +6,7 @@ public class UserRequest {
 	private String lastName;
 	private String birthday;
 	private String address;
-	private int postCode;
+	private String postCode;
 	private String cityId;
 	private String phone;
 	private String gender;
@@ -15,7 +15,7 @@ public class UserRequest {
 	private String description;
 	private String avatar;
 
-	public UserRequest(String userId, String firstName, String lastName, String birthday, String address, int postCode,
+	public UserRequest(String userId, String firstName, String lastName, String birthday, String address, String postCode,
 			String cityId, String phone, String gender, String businessCategoryIds, String jobCategoryIds,
 			String description, String avatar) {
 		super();
@@ -66,11 +66,11 @@ public class UserRequest {
 		this.address = address;
 	}
 
-	public int getPostCode() {
+	public String getPostCode() {
 		return postCode;
 	}
 
-	public void setPostCode(int postCode) {
+	public void setPostCode(String postCode) {
 		this.postCode = postCode;
 	}
 

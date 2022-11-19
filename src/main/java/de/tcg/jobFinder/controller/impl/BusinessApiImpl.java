@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -195,8 +196,49 @@ public class BusinessApiImpl implements BusinessApi {
 
 	@Override
 	public ResponseEntity<?> editJob(HttpServletRequest request, String businessId, String jobId, JobRequest jobRequest) {
-		// TODO Auto-generated method stub
-		return null;
+		Job job = jobService.getjobByJobId(jobId);
+		job.setJobName(jobRequest.getJobName());
+		job.setJobAddress(jobRequest.getJobAddress());
+		job.setJobDescription(jobRequest.getJobDescription());
+		job.setJobRequirements(jobRequest.getJobRequirements());
+		job.setJobBenefits(jobRequest.getJobBenefits());
+
+//		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+		job.setExpiredTime(LocalDateTime.parse(jobRequest.getExpiredTime()));
+		job.setActive(true);
+
+		City city = jobService.getCityById(Long.valueOf(jobRequest.getCityId()));
+		job.setCity(city);
+
+		JobCategory jobCategory = jobService.getJobCategoryById(Long.valueOf(jobRequest.getJobCategoryId()));
+		job.setJobCategory(jobCategory);
+
+		job.setPostCode(Integer.valueOf(jobRequest.getPostCode()));
+		job.setJobLatitude(0);
+		job.setJobLongitude(0);
+		job.setWorkingTime(jobRequest.getWorkingTime());
+		job.setNote("");
+		job.setSalaryFrom(Float.parseFloat(jobRequest.getSalaryFrom()));
+		job.setSalaryTo(Float.parseFloat(jobRequest.getSalaryTo()));
+
+//		System.out.println(job.toString());
+
+		List<JobTag> jobTags = new ArrayList<JobTag>();
+		List<String> myList = new ArrayList<String>(Arrays.asList(jobRequest.getJobTagsId().split(",")));
+		for (String l : myList) {
+			JobTag tag = jobService.getJobTagById(Long.valueOf(l));
+			jobTags.add(tag);
+		}
+//		for(JobTag tag : jobTags) {
+//			System.out.println(tag.toString());
+//		}
+		Set<JobTag> targetSet = new HashSet<JobTag>(jobTags);
+		job.setJobTag(targetSet);
+
+		if (jobService.updateJob(request, businessId, job))
+			return ResponseEntity.ok(new SuccessResponse(0, "success", null));
+
+		return ResponseEntity.ok(new SuccessResponse(1, "fail", null));
 	}
 
 	@Override

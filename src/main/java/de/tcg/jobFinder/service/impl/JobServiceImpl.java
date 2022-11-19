@@ -138,6 +138,24 @@ public class JobServiceImpl extends UntilService implements JobService {
 
 		return false;
 	}
+	
+	@Override
+	public boolean updateJob(HttpServletRequest request, String businessId, Job job) {
+		String token = toToken(request);
+		if (token != null) {
+			AccountToken accountToken = accountTokenService.getAccountTokenByAccessToken(token);
+			if (accountToken != null && accountToken.isActive()) {
+				Account account = myUserDetailsService.getAccountByAccountId(accountToken.getAccountId());
+
+				if (account.isBusiness() && account.getBusinessId().equals(businessId)) {
+					jobReposity.save(job);
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
 
 	@Override
 	public JobTag getJobTagById(long jobTagsId) {
@@ -394,5 +412,10 @@ public class JobServiceImpl extends UntilService implements JobService {
 		}
 
 		return false;
+	}
+
+	@Override
+	public Job getjobByJobId(String jobId) {
+		return jobReposity.findByJobId(jobId);
 	}
 }

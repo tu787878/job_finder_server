@@ -1,7 +1,7 @@
 package de.tcg.jobFinder.template.email;
 
 public enum TemplateName {
-	APPLIEDJOBTOUSER("ApplyJobToBusiness"), APPLIEDJOBTOBUSINESS("AppliedJobToUser");
+	APPLIEDJOBTOBUSINESS("AppliedJobToBusiness"), APPLIEDJOBTOUSER("AppliedJobToUser");
 
 	private String name;
 
